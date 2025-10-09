@@ -59,7 +59,7 @@ export class Project {
             this.#orderByPriorityList.push(0);
             this.#orderByDueDateList.push(0);
         } else {
-            // Time added
+            // Entry order
             this.#orderByEntryOrderList.push(thisToDoIndex);
     
             // If the new todo isn't added to the priority/dueDate list during the loop
@@ -115,6 +115,69 @@ export class Project {
             // If the todo was never added we need to append it to the end of the array
             if (!addedToList) {
                 dateList.push(todo);
+            }
+        }
+    }
+
+    deleteTodoFromProject(todoTitle) { // It may be better to use an ID than a title since I don't check to make sure the same title isn't used for multiple todos
+        // Find the index for the item in the bast list that needs to be deleted
+        let indexToDelete = -1;
+        for (let i = 0; i < this.#baseItemList.length; i++) {
+            if (todoTitle === this.#baseItemList[i].getTitle()) {
+                indexToDelete = i;
+                break;
+            }
+        }
+
+        if (indexToDelete === -1) {
+            console.log(`Couldn't find todo \"${todoTitle}\" in project \"${this.title}\" when attempting to delete the todo.`);
+            return;
+        }
+
+        // In each of the orderBy lists remove the specified index
+        // and decrement all index numbers higher than the index to be deleted
+        for (let i = 0; i < this.#baseItemList.length; i++) {
+            this.#deleteTodoInList("entryOrder", i, indexToDelete);
+            this.#deleteTodoInList("priority", i, indexToDelete);
+            this.#deleteTodoInList("dueDate", i, indexToDelete);
+        }
+
+        // Remove item in the base list (this is done after so the above loop isn't messed up by removing an entry from the base list)
+        this.#baseItemList.splice(indexToDelete, 1);
+        this.#itemCount--;
+    }
+
+    #deleteTodoInList(orderBy, i, indexToDelete) {
+        let listToCheck;
+        if (orderBy === "entryOrder") {
+            listToCheck = this.#orderByEntryOrderList;
+        } else if (orderBy === "priority") {
+            listToCheck = this.#orderByPriorityList;
+        } else if (orderBy = "dueDate") {
+            listToCheck = this.#orderByDueDateList;
+        } else {
+            console.log("Invalid orderBy list name given when deleting a todo");
+            return;
+        }
+
+        /**
+         * If the index to delete was found at an earlier point during the search process then the listToCheck is 1 smaller.
+         * However the for loop calling this function doesn't know that, so a manual check is needed to abort the deletion
+         * if the index to delete was found before as [i] would go beyond the memory of the array when used.
+         */
+        if (i ===  listToCheck.length) {
+            return;
+        }
+
+        valAtI = listToCheck[i];
+        if (valAtI > indexToDelete) {
+            listToCheck[i] -= 1;
+        } else if (valAtI === indexToDelete) {
+            listToCheck.splice(i, 1);
+            // If a splice occurred the next i value would skip over the value that was moved down to i, this checks that value
+            // Because the last item could've been deleted, this check needs to make sure it doesn't look beyond the array's length
+            if (listToCheck.length > i && listToCheck[i] > indexToDelete) {
+                listToCheck[i] -= 1;
             }
         }
     }
