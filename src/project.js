@@ -3,7 +3,7 @@ export class Project {
 
     constructor(title) {
         this.title = title;
-        projectArray.push(this);
+        Project.projectArray.push(this);
     }
 
     #itemCount = 0;
@@ -92,7 +92,7 @@ export class Project {
 
             // If the todo was never added we need to append it to the end of the array
             if (!addedToList) {
-                prioList.push(todo);
+                prioList.push(thisToDoIndex);
             }
             addedToList = false;
 
@@ -103,13 +103,13 @@ export class Project {
                 let dateDiff = this.#getDueDateDifferenceBetweenTodos(todoInList, newTodo);
                 
                 if (dateDiff > 0) { // The new todo has a dueDate before the one in the list
-                    prioList.splice(i, 0, thisToDoIndex);
+                    dateList.splice(i, 0, thisToDoIndex);
                     addedToList = true;
                     break;
                 } else if (dateDiff === 0) { // Same dueDate, check priority
                     let prioDiff = this.#getPriorityDifferenceBetweenTodos(todoInList, newTodo);
                     if (prioDiff < 0) { // The todo in the list has a lesser priority, add the new todo here
-                        prioList.splice(i, 0, thisToDoIndex);
+                        dateList.splice(i, 0, thisToDoIndex);
                         addedToList = true;
                         break;
                     }
@@ -118,7 +118,7 @@ export class Project {
 
             // If the todo was never added we need to append it to the end of the array
             if (!addedToList) {
-                dateList.push(todo);
+                dateList.push(thisToDoIndex);
             }
         }
     }
@@ -173,7 +173,7 @@ export class Project {
             return;
         }
 
-        valAtI = listToCheck[i];
+        let valAtI = listToCheck[i];
         if (valAtI > indexToDelete) {
             listToCheck[i] -= 1;
         } else if (valAtI === indexToDelete) {
