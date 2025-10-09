@@ -8,6 +8,10 @@ export class Project {
 
     #itemCount = 0;
 
+    getItemCount() {
+        return this.#itemCount;
+    }
+
     // Item lists hold the items that can go into a project, only Todos for now
     #baseItemList = []; // The base list holds items as they are added to the project and referenced by the orderBy lists
         // The orderBy lists hold the indices of Todos in the baseItemList based on the specified order
