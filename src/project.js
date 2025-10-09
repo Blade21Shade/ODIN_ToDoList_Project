@@ -1,6 +1,16 @@
 export class Project {
     static projectArray = []; // Holds all the projects created by the user, DOM manipulation will use this
 
+    static removeProjectFromProjectArray(projectTitleToRemove) {
+        for (let i = 0; i < Project.projectArray.length; i++) {
+            if (projectTitleToRemove === Project.projectArray[i].getTitle()) {
+                Project.projectArray.splice(i, 1);
+                return;
+            }
+        }
+        console.log(`Couldn't find project with name ${projectTitleToRemove} when attempting to delete a project`)
+    }
+
     constructor(title) {
         this.title = title;
         Project.projectArray.push(this);
@@ -10,6 +20,10 @@ export class Project {
 
     getItemCount() {
         return this.#itemCount;
+    }
+
+    getTitle(){
+        return this.title;
     }
 
     // Item lists hold the items that can go into a project, only Todos for now
