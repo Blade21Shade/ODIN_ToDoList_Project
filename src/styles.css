@@ -3,8 +3,10 @@ body {
     padding: 0px;
 
     display: grid;
-    grid-template-columns: 20vw 80vw;
+    grid-template-columns: 20% 80%;
     grid-template-rows: 100vh;
+
+    overflow: clip;
 }
 
 .project-sidebar {
