@@ -1,19 +1,42 @@
 export class Project {
-    static projectArray = []; // Holds all the projects created by the user, DOM manipulation will use this
+    static #projectArray = []; // Holds all the projects created by the user, DOM manipulation will use this
 
+    static getProjectFromProjectArray(projectTitle) {
+        for (let i = 0; i < Project.#projectArray.length; i++) {
+            if (projectTitle === Project.#projectArray[i].getTitle()) {
+                return Project.#projectArray[i];
+            }
+        }
+        console.log(`Couldn't find project with title ${projectTitleToRemove} when attempting to retrieve a project`);
+    }
+    
     static removeProjectFromProjectArray(projectTitleToRemove) {
-        for (let i = 0; i < Project.projectArray.length; i++) {
-            if (projectTitleToRemove === Project.projectArray[i].getTitle()) {
-                Project.projectArray.splice(i, 1);
+        for (let i = 0; i < Project.#projectArray.length; i++) {
+            if (projectTitleToRemove === Project.#projectArray[i].getTitle()) {
+                Project.#projectArray.splice(i, 1);
                 return;
             }
         }
-        console.log(`Couldn't find project with name ${projectTitleToRemove} when attempting to delete a project`)
+        console.log(`Couldn't find project with title ${projectTitleToRemove} when attempting to delete a project`);
+    }
+
+    static getProjectArray() {
+        return Project.#projectArray;
+    }
+
+    static getProjectArrayWithoutTodos() {
+        let toReturn = [];
+        for (let i = 0; i < Project.#projectArray.length; i++) {
+            let title = Project.#projectArray[i].getTitle();
+            let itemCount = Project.#projectArray[i].getItemCount();
+            toReturn.push({title, itemCount});
+        }
+        return toReturn;
     }
 
     constructor(title) {
         this.title = title;
-        Project.projectArray.push(this);
+        Project.#projectArray.push(this);
     }
 
     #itemCount = 0;
@@ -22,8 +45,12 @@ export class Project {
         return this.#itemCount;
     }
 
-    getTitle(){
+    getTitle() {
         return this.title;
+    }
+
+    setTitle(title) {
+        this.title = title;
     }
 
     // Item lists hold the items that can go into a project, only Todos for now
@@ -63,8 +90,8 @@ export class Project {
     addNewTodoToProject(newTodo) {
         // In theory a check for the type of item is needed but since importing Todo seems wrong I'm omitting this
         // In an ideal situation I would write wrappers for the types Project can take and have those handle this logic, but for now we'll just have to pretend
-        // if (!todo instanceof Todo) { 
-        //     console.log(`Incorrect item given to project list: Not adding to project\nExpect: Todo\nGiven: ${typeof todo}`);
+        // if (!newTodo instanceof Todo) { 
+        //     console.log(`Incorrect item given to project list: Not adding to project\nExpect: Todo\nGiven: ${typeof newTodo}`);
         //     return;
         // }
         let thisToDoIndex = this.#itemCount;

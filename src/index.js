@@ -24,6 +24,7 @@ let proj1 = new Project("A Project");
 let proj2 = new Project("Project 2");
 let proj3 = new Project("Project 3");
 
-Project.removeProjectFromProjectArray("Project 2");
+let fullProjectList = Project.getProjectArray();
+let projectListWithoutTodos = Project.getProjectArrayWithoutTodos();
 
 let a = 1;
