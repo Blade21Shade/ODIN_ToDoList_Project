@@ -8,7 +8,7 @@ body {
 }
 
 .project-sidebar {
-    border-right: 1px solid black;
+    border-right: 5px solid white;
     overflow: auto;
     
     grid-column: 1 / 2;
@@ -31,12 +31,29 @@ body {
 }
 
 .project-display-area {
-    display: grid;
     grid-column: 2 / -1;
+    display: grid;
+    grid-template-rows: calc(20% + 5px) calc(80% - 5px);
+    gap: 5px;
 }
 
 .project-info {
+    background-color: rgb(50, 169, 209);
+    
     display: grid;
+    grid-template-rows: 50% 50%;
+}
+
+.project-info .project-title {
+    font-size: 3rem;
+    justify-self: center;
+}
+
+.project-info .project-functionality {
+    display: grid;
+    grid-template-columns: repeat(5, 20%);
+    grid-template-rows: 100%;
+    place-items: center;
 }
 
 .item-list {

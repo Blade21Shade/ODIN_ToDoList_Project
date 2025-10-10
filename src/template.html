@@ -7,11 +7,35 @@
 </head>
 <body>
     <div class="project-sidebar">
-        <div class="project-selector" id="project-list-view"></div> <!-- This can be clicked to view all projects, it has different functionality than a regular project-->
+        <!--The top entry is for viewing all projects instead of items for a specific project-->
+        <div class="project-selector" id="project-list-view"></div>
         <div class="project-selector"></div>
     </div>
     <div class="project-display-area">
-        <div class="project-info"></div>
+        <div class="project-info">
+            <h1 class="project-title">Title Example</h1>
+            <div class="project-functionality">
+                <p>Item Count: <span class="project-item-count"></span></p>
+                <button class="create-new-item-in-project-button">Create New Item</button>
+                <button class="view-edit-project-button">View/Edit Project Details</button>
+                <button class="delete-project-button">Delete Project</button>
+                <div>
+                    <label for="orderItemsBy">Order Items By:</label>
+                    <select name="orderItemsBy" id="orderItemsBy">
+                        <optgroup label="Regular Order">
+                            <option value="entryOrder">Entry Order</option>
+                            <option value="priority">Priority</option>
+                            <option value="dueDate">Due Date</option>
+                        </optgroup>
+                        <optgroup label="Reverse Order">
+                            <option value="entryOrderReverse">Reverse Entry Order</option>
+                            <option value="priorityReverse">Reverse Priority</option>
+                            <option value="dueDateReverse">Reverse Due Date</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+        </div>
         <div class="item-list"></div>
     </div>
 </body>
