@@ -1,5 +1,6 @@
 import {Todo} from "./toDo.js"
 import {Project} from "./project.js"
+import "./styles.css"
 
 let dateArray = [
     new Date(2000, 0, 10), // 1/10/2000

@@ -1,0 +1,44 @@
+body {
+    margin: 0px;
+    padding: 0px;
+
+    display: grid;
+    grid-template-columns: 20vw 80vw;
+    grid-template-rows: 100vh;
+}
+
+.project-sidebar {
+    border-right: 1px solid black;
+    overflow: auto;
+    
+    grid-column: 1 / 2;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-auto-rows: 10%;
+    gap: 5px;
+}
+
+.project-selector {
+    background-color: rgb(50, 169, 209);
+
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 50% 50%;
+}
+
+.project-selector:hover {
+    box-shadow: 0px 2px 3px black;
+}
+
+.project-display-area {
+    display: grid;
+    grid-column: 2 / -1;
+}
+
+.project-info {
+    display: grid;
+}
+
+.item-list {
+    display: grid;
+}
