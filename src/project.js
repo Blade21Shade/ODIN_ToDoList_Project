@@ -1,5 +1,6 @@
 export class Project {
     static #projectArray = []; // Holds all the projects created by the user, DOM manipulation will use this
+    static #projectArrayCount = 0;
 
     static getProjectFromProjectArray(projectTitle) {
         for (let i = 0; i < Project.#projectArray.length; i++) {
@@ -14,6 +15,7 @@ export class Project {
         for (let i = 0; i < Project.#projectArray.length; i++) {
             if (projectTitleToRemove === Project.#projectArray[i].getTitle()) {
                 Project.#projectArray.splice(i, 1);
+                Project.#projectArrayCount--;
                 return;
             }
         }
@@ -22,6 +24,10 @@ export class Project {
 
     static getProjectArray() {
         return Project.#projectArray;
+    }
+
+    static getProjectArrayCount() {
+        return Project.#projectArrayCount;
     }
 
     static getProjectArrayWithoutTodos() {
@@ -36,6 +42,7 @@ export class Project {
 
     constructor(title) {
         this.title = title;
+        Project.#projectArrayCount++;
         Project.#projectArray.push(this);
     }
 

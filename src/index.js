@@ -1,6 +1,6 @@
 import {Todo} from "./toDo.js"
 import {Project} from "./project.js"
-import {fillInProjectSideBar} from "./dom.js"
+import * as DomManipulation from "./dom.js"
 import "./styles.css"
 
 let dateArray = [
@@ -55,6 +55,4 @@ proj3.addNewTodoToProject(todo6);
 proj3.addNewTodoToProject(todo7);
 
 // DOM Manipulation
-// Side bar
-let projectsWithoutTodos = Project.getProjectArrayWithoutTodos();
-fillInProjectSideBar(projectsWithoutTodos);
+DomManipulation.initializeDom(Project.getProjectArrayWithoutTodos(), Project.getProjectArrayCount());
