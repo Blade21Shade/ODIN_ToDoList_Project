@@ -63,12 +63,12 @@ body {
 
 /* Item list */
 .item-list {
-    overflow: scroll;
+    overflow: auto;
 
     display: grid;
     gap: 5px;
 }
 
-.item-container {
+.item-container, .item-project-container {
     border: 1px solid black;
 }

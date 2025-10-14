@@ -95,8 +95,37 @@ let itemListElement = document.querySelector(".item-list");
 let orderItemsBy = document.querySelector("#orderItemsBy");
 
 function updateItemList() {
+    itemListElement.replaceChildren();
+
     let itemList;
     let orderBy = orderItemsBy.value;
+
+    if (currentProject.id === "project-list-view") { // View all projects
+        let projects = Project.getProjectArrayWithoutTodos();
+
+        for (const project of projects) {
+            let itemContainer = document.createElement("div");
+            itemContainer.classList.toggle("item-project-container");
+
+            // Title
+            let titleEle = document.createElement("div");
+            titleEle.classList.toggle("item-project-title")
+            titleEle.innerText = project.title;
+            itemContainer.appendChild(titleEle);
+
+            // Item Count
+            let countEle = document.createElement("div");
+            countEle.classList.toggle("item-project-count")
+            countEle.innerText = project.itemCount;
+            itemContainer.appendChild(countEle);
+
+            // Add to item list
+            itemListElement.appendChild(itemContainer);
+        }
+
+        return; // Don't do regular item logic
+    }
+
     switch(orderBy) {
         case "entryOrder":
         case "priority":
@@ -113,8 +142,6 @@ function updateItemList() {
             itemList = currentProject.getTodosByOrderedList("dueDate", true);
             break;
     }
-
-    itemListElement.replaceChildren();
 
     for (const item of itemList) {
         let itemContainer = document.createElement("div");
