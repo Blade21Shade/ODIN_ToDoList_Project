@@ -27,6 +27,7 @@ projectSidebar.addEventListener("click", (e) => {
     }
     updateCurrentProject(selectedProject);
     updateProjectInfoElement();
+    updateItemList();
 });
 
 function fillInProjectSideBar(projectsWithoutTodos) {
@@ -86,6 +87,87 @@ function updateProjectInfoElement() {
     }
     projectTitle.innerText = title;
     projectItemCount.innerText = itemCount;
+}
+
+// Item list
+
+let itemListElement = document.querySelector(".item-list");
+let orderItemsBy = document.querySelector("#orderItemsBy");
+
+function updateItemList() {
+    let itemList;
+    let orderBy = orderItemsBy.value;
+    switch(orderBy) {
+        case "entryOrder":
+        case "priority":
+        case "dueDate":
+            itemList = currentProject.getTodosByOrderedList(orderBy, false);
+            break;
+        case "entryOrderReverse":
+            itemList = currentProject.getTodosByOrderedList("entryOrder", true);
+            break;
+        case "priorityReverse":
+            itemList = currentProject.getTodosByOrderedList("priority", true);
+            break;
+        case "dueDateReverse":
+            itemList = currentProject.getTodosByOrderedList("dueDate", true);
+            break;
+    }
+
+    itemListElement.replaceChildren();
+
+    for (const item of itemList) {
+        let itemContainer = document.createElement("div");
+        itemContainer.classList.toggle("item-container");
+
+        // Title
+        let titleEle = document.createElement("div");
+        titleEle.classList.toggle("item-title")
+        titleEle.innerText = item.getTitle();
+        itemContainer.appendChild(titleEle);
+
+        // Due data - Prio, due date, is complete
+        let dueDataContainer = document.createElement("div");
+        dueDataContainer.classList.toggle("item-due-data-container");
+
+        let prioEle = document.createElement("div");
+        prioEle.innerText = "Priority: " + item.getPriority();
+        let dueDateEle = document.createElement("div");
+        dueDateEle.innerText = "Due Date: " + item.getDueDate();
+        
+        let isComplete = item.getIsComplete();
+        let isCompleteEle = document.createElement("input");
+        isCompleteEle.type = "checkbox";
+        if (isComplete) {
+            isCompleteEle.checked = true;
+        } else {
+            isCompleteEle.checked = false;
+        }
+
+        dueDataContainer.append(prioEle, dueDateEle, isCompleteEle);
+        itemContainer.appendChild(dueDataContainer);
+
+        // Description
+        let descEle = document.createElement("div");
+        descEle.classList.toggle("item-description");
+        descEle.innerText = item.getDescription();
+        itemContainer.appendChild(descEle);
+
+        // Buttons
+        let btnContainer = document.createElement("div");
+        btnContainer.classList.toggle("button-container");
+        
+        let viewEditButton = document.createElement("button");
+        viewEditButton.innerText = "View/Edit";
+        let deleteButton = document.createElement("button");
+        deleteButton.innerText = "Delete";
+
+        btnContainer.append(viewEditButton, deleteButton);
+        itemContainer.appendChild(btnContainer);
+
+        // Add this item to the item-list
+        itemListElement.appendChild(itemContainer);
+    }
 }
 
 export {fillInProjectSideBar, initializeDom}

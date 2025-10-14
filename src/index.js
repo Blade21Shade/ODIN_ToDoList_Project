@@ -38,19 +38,13 @@ proj1.addNewTodoToProject(todo5);
 proj1.addNewTodoToProject(todo6);
 proj1.addNewTodoToProject(todo7);
 
-proj2.addNewTodoToProject(todo1);
-proj2.addNewTodoToProject(todo2);
-proj2.addNewTodoToProject(todo3);
+
 proj2.addNewTodoToProject(todo4);
 proj2.addNewTodoToProject(todo5);
 proj2.addNewTodoToProject(todo6);
 proj2.addNewTodoToProject(todo7);
 
-proj3.addNewTodoToProject(todo1);
-proj3.addNewTodoToProject(todo2);
-proj3.addNewTodoToProject(todo3);
-proj3.addNewTodoToProject(todo4);
-proj3.addNewTodoToProject(todo5);
+
 proj3.addNewTodoToProject(todo6);
 proj3.addNewTodoToProject(todo7);
 
