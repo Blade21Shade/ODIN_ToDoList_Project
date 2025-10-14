@@ -67,6 +67,15 @@ export class Project {
     #orderByPriorityList = []; // Ordered by the Priority of Todos, further ordered by date, further ordered by entry order
     #orderByDueDateList = []; // Ordered by the DueDate of Todos, further ordered by Priority, further ordered by entry order
 
+    getTodoByTitle(title) {
+        for (const todo of this.#baseItemList) {
+            if (todo.getTitle() === title) {
+                return todo;
+            }
+        }
+        console.log(`Couldn't find todo with title \"${title}\" in this project.`)
+    }
+
     getTodosByOrderedList(orderedBy, reverseOrder) {
         let list;
         if (orderedBy === "entryOrder") {

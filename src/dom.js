@@ -5,6 +5,7 @@ function initializeDom(projectArrayWithoutTodos, projectCount) {
     fillInProjectSideBar(projectArrayWithoutTodos);
     updateCurrentProject({title: "All Projects", itemCount: projectCount, id: "project-list-view"});
     updateProjectInfoElement();
+    updateItemList();
 }
 
 // Side bar
@@ -97,7 +98,6 @@ orderItemsBy.addEventListener("change", () => {
 // Item list
 
 let itemListElement = document.querySelector(".item-list");
-
 
 function updateItemList() {
     itemListElement.replaceChildren();
@@ -201,5 +201,20 @@ function updateItemList() {
         itemListElement.appendChild(itemContainer);
     }
 }
+
+itemListElement.addEventListener("click", (e) => {
+    let target = e.target;
+    if (target.type === "button") {
+        if (target.innerText == "View/Edit") {
+
+        } else { // Delete button
+
+        }
+    } else if (target.type === "checkbox") { // Is complete checkbox
+        let title = e.target.parentElement.parentElement.firstElementChild.innerText;
+        let todo = currentProject.getTodoByTitle(title);
+        todo.setIsComplete(target.checked);
+    }
+});
 
 export {fillInProjectSideBar, initializeDom}
