@@ -1,5 +1,7 @@
 import {Project} from "./project.js"
 
+let pageDialogEle = document.querySelector("#page-dialog"); // This is used in a couple places, so it's being defined generally
+
 // Initialization function
 function initializeDom(projectArrayWithoutTodos, projectCount) {
     fillInProjectSideBar(projectArrayWithoutTodos);
@@ -96,7 +98,6 @@ orderItemsBy.addEventListener("change", () => {
 })
 
 // Item list
-
 let itemListElement = document.querySelector(".item-list");
 
 function updateItemList() {
@@ -204,9 +205,117 @@ function updateItemList() {
 
 itemListElement.addEventListener("click", (e) => {
     let target = e.target;
-    if (target.type === "button") {
+    if (target.type === "submit") { // button
+        let title = e.target.parentElement.parentElement.firstElementChild.innerText;
+        let todo = currentProject.getTodoByTitle(title);
+        pageDialogEle.replaceChildren();
         if (target.innerText == "View/Edit") {
+            let viewEditForm = document.createElement("form");
+            viewEditForm.classList.toggle("view-edit-form");
+            // Info
+            let fieldsetInfo = document.createElement("fieldset");
+                // Title
+            let titleLabel = document.createElement("label");
+            titleLabel.htmlFor = "title";
+            titleLabel.innerText = "Title:";
+            fieldsetInfo.appendChild(titleLabel);
+            let title = document.createElement("input");
+            title.id = "title";
+            title.required = true;
+            title.value = todo.getTitle();
+            fieldsetInfo.appendChild(title);
+                // Priority
+            let prioLabel = document.createElement("label");
+            prioLabel.htmlFor = "priority";
+            prioLabel.innerText = "Priority:";
+            fieldsetInfo.appendChild(prioLabel);
+            let prio = document.createElement("input");
+            prio.id = "priority";
+            prio.type = "number";
+            prio.min = "1";
+            prio.max = "10";
+            prio.required = true;
+            prio.value = todo.getPriority();
+            fieldsetInfo.appendChild(prio);
+                // Due date
+            let dateLabel = document.createElement("label");
+            dateLabel.htmlFor = "due-date";
+            dateLabel.innerText = "Due Date:";
+            fieldsetInfo.appendChild(dateLabel);
+            let dueDate = document.createElement("input");
+            dueDate.id = "due-date";
+            dueDate.type = "date";
+            dueDate.required = true;
+            let date = todo.getDueDate();
+            
+            dueDate.value = todo.getDueDate();
+            fieldsetInfo.appendChild(dueDate);
+                // Is complete
+            let isCompleteLabel = document.createElement("label");
+            isCompleteLabel.htmlFor = "is-complete";
+            isCompleteLabel.innerText = "Is Complete:";
+            fieldsetInfo.appendChild(isCompleteLabel);
+            let isComplete = document.createElement("input");
+            isComplete.id = "is-complete";
+            isComplete.type = "checkbox";
+            isComplete.value = todo.getIsComplete();
+            fieldsetInfo.appendChild(isComplete);
 
+            viewEditForm.appendChild(fieldsetInfo);
+            // Desc and notes
+            let fieldsetDescNotes = document.createElement("fieldset");;
+                // Desc
+            let descLabel = document.createElement("label");
+            descLabel.htmlFor = "description";
+            descLabel.innerText = "Description";
+            fieldsetDescNotes.appendChild(descLabel);
+            let desc = document.createElement("textarea");
+            desc.id = "description";
+            desc.innerText = todo.getDescription();
+            fieldsetDescNotes.appendChild(desc);
+                // Notes
+            let notesLabel = document.createElement("label");
+            notesLabel.htmlFor = "notes";
+            notesLabel.innerText = "Notes";
+            fieldsetDescNotes.appendChild(notesLabel);
+            let notes = document.createElement("textarea");
+            notes.id = "notes";
+            notes.innerText = todo.getNotes();
+            fieldsetDescNotes.appendChild(notes);
+
+            viewEditForm.appendChild(fieldsetDescNotes);
+            // Buttons
+            let fieldsetButtons = document.createElement("fieldset");;
+                // Save changes
+            let saveButton = document.createElement("button");
+            saveButton.innerText = "Save Changes and Close";
+            saveButton.addEventListener("click", (e) => {
+                e.preventDefault();
+
+                todo.setTitle(title.value);
+                todo.setPriority(prio.value);
+                todo.setDueDate(dueDate.value);
+                todo.setIsComplete(isComplete.value);
+                todo.setDescription(desc.value);
+                todo.setNotes(notes.value);
+
+                updateItemList();
+                pageDialogEle.close();
+            });
+            fieldsetButtons.appendChild(saveButton);
+                // Discard changes
+            let discardButton = document.createElement("button");
+            discardButton.innerText = "Discard Changes and Close";
+            discardButton.addEventListener("click", (e) => {
+                e.preventDefault();
+                pageDialogEle.close();
+            });
+            fieldsetButtons.appendChild(discardButton);
+
+            viewEditForm.appendChild(fieldsetButtons);
+            // Add to dialog
+            pageDialogEle.appendChild(viewEditForm);
+            pageDialogEle.showModal();
         } else { // Delete button
 
         }
