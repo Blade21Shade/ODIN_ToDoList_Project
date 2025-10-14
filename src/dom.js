@@ -89,10 +89,15 @@ function updateProjectInfoElement() {
     projectItemCount.innerText = itemCount;
 }
 
+let orderItemsBy = document.querySelector("#orderItemsBy");
+orderItemsBy.addEventListener("change", () => {
+    updateItemList();
+})
+
 // Item list
 
 let itemListElement = document.querySelector(".item-list");
-let orderItemsBy = document.querySelector("#orderItemsBy");
+
 
 function updateItemList() {
     itemListElement.replaceChildren();
