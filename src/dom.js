@@ -317,7 +317,36 @@ itemListElement.addEventListener("click", (e) => {
             pageDialogEle.appendChild(viewEditForm);
             pageDialogEle.showModal();
         } else { // Delete button
+            let deleteTodoEle = document.createElement("div");
+            deleteTodoEle.classList.toggle("delete-todo-dialog");
+            
+            let areYouSure = document.createElement("div");
+            areYouSure.innerText = "Are you sure you want to delete this todo?"
+            deleteTodoEle.appendChild(areYouSure);
+            
+            // Buttons
+            let buttonContainer = document.createElement("div");
+                // Delete
+            let deleteButton = document.createElement("button");
+            deleteButton.innerText = "Yes";
+            deleteButton.addEventListener("click", () => {
+                currentProject.deleteTodoFromProject(title);
+                updateItemList();
+                updateProjectInfoElement();
+                pageDialogEle.close();
+            });
+                // Cancel delete
+            let cancelButton = document.createElement("button");
+            cancelButton.innerText = "Cancel";
+            cancelButton.addEventListener("click", () => {
+                pageDialogEle.close();
+            });
+            buttonContainer.append(deleteButton, cancelButton);
+            deleteTodoEle.appendChild(buttonContainer);
 
+            // Add to dialog
+            pageDialogEle.appendChild(deleteTodoEle);
+            pageDialogEle.showModal();
         }
     } else if (target.type === "checkbox") { // Is complete checkbox
         let title = e.target.parentElement.parentElement.firstElementChild.innerText;
