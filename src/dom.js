@@ -168,6 +168,10 @@ function updateItemList() {
         let dueDateEle = document.createElement("div");
         dueDateEle.innerText = "Due Date: " + item.getDueDate();
         
+        let isCompleteContainer = document.createElement("div");
+        isCompleteContainer.classList.toggle("item-is-complete-container");
+        let isCompleteText = document.createElement("div");
+        isCompleteText = "Is Complete "
         let isComplete = item.getIsComplete();
         let isCompleteEle = document.createElement("input");
         isCompleteEle.type = "checkbox";
@@ -176,8 +180,9 @@ function updateItemList() {
         } else {
             isCompleteEle.checked = false;
         }
+        isCompleteContainer.append(isCompleteText, isCompleteEle);
 
-        dueDataContainer.append(prioEle, dueDateEle, isCompleteEle);
+        dueDataContainer.append(prioEle, dueDateEle, isCompleteContainer);
         itemContainer.appendChild(dueDataContainer);
 
         // Description
@@ -205,10 +210,9 @@ function updateItemList() {
 
 itemListElement.addEventListener("click", (e) => {
     let target = e.target;
-    let title = e.target.parentElement.parentElement.firstElementChild.innerText;
-    let todo = currentProject.getTodoByTitle(title);
-
     if (target.type === "submit") { // button
+        let title = e.target.parentElement.parentElement.firstElementChild.innerText;
+        let todo = currentProject.getTodoByTitle(title);
         pageDialogEle.replaceChildren();
         if (target.innerText == "View/Edit") {
             let viewEditForm = document.createElement("form");
@@ -363,6 +367,8 @@ itemListElement.addEventListener("click", (e) => {
             pageDialogEle.showModal();
         }
     } else if (target.type === "checkbox") { // "Is Complete" checkbox
+        let title = e.target.parentElement.parentElement.parentElement.firstElementChild.innerText;
+    let todo = currentProject.getTodoByTitle(title);
         todo.setIsComplete(target.checked);
     }
 });
