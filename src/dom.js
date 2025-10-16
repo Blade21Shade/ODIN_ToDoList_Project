@@ -229,13 +229,19 @@ itemListElement.addEventListener("click", (e) => {
             prioLabel.htmlFor = "priority";
             prioLabel.innerText = "Priority:";
             fieldsetInfo.appendChild(prioLabel);
-            let prio = document.createElement("input");
+            let prio = document.createElement("select");
             prio.id = "priority";
-            prio.type = "number";
-            prio.min = "1";
-            prio.max = "10";
+            let currentPriority = todo.getPriority();
+            for (let i = 1; i < 11;i++) {
+                let priorityOption = document.createElement("option");
+                priorityOption.value = i;
+                priorityOption.innerText = `${i}`;
+                if (i === currentPriority) {
+                    priorityOption.selected = true;
+                }
+                prio.appendChild(priorityOption);
+            }
             prio.required = true;
-            prio.value = todo.getPriority();
             fieldsetInfo.appendChild(prio);
                 // Due date
             let dateLabel = document.createElement("label");
@@ -291,9 +297,9 @@ itemListElement.addEventListener("click", (e) => {
             saveButton.innerText = "Save Changes and Close";
             saveButton.addEventListener("click", (e) => {
                 e.preventDefault();
-
+                
                 todo.setTitle(title.value);
-                todo.setPriority(prio.value);
+                todo.setPriority(Number.parseFloat(prio.value));
                 todo.setDueDate(dueDate.value);
                 todo.setIsComplete(isComplete.value);
                 todo.setDescription(desc.value);
