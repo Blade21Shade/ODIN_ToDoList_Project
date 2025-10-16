@@ -205,9 +205,10 @@ function updateItemList() {
 
 itemListElement.addEventListener("click", (e) => {
     let target = e.target;
+    let title = e.target.parentElement.parentElement.firstElementChild.innerText;
+    let todo = currentProject.getTodoByTitle(title);
+
     if (target.type === "submit") { // button
-        let title = e.target.parentElement.parentElement.firstElementChild.innerText;
-        let todo = currentProject.getTodoByTitle(title);
         pageDialogEle.replaceChildren();
         if (target.innerText == "View/Edit") {
             let viewEditForm = document.createElement("form");
@@ -265,6 +266,9 @@ itemListElement.addEventListener("click", (e) => {
             isComplete.id = "is-complete";
             isComplete.type = "checkbox";
             isComplete.value = todo.getIsComplete();
+            if (isComplete.value === "true") {
+                isComplete.checked = true;
+            }
             fieldsetInfo.appendChild(isComplete);
 
             viewEditForm.appendChild(fieldsetInfo);
@@ -297,11 +301,15 @@ itemListElement.addEventListener("click", (e) => {
             saveButton.innerText = "Save Changes and Close";
             saveButton.addEventListener("click", (e) => {
                 e.preventDefault();
-                
+
                 todo.setTitle(title.value);
                 todo.setPriority(Number.parseFloat(prio.value));
                 todo.setDueDate(dueDate.value);
-                todo.setIsComplete(isComplete.value);
+                if (isComplete.checked === true) {
+                    todo.setIsComplete(true);
+                } else {
+                    todo.setIsComplete(false);
+                }
                 todo.setDescription(desc.value);
                 todo.setNotes(notes.value);
 
@@ -354,9 +362,7 @@ itemListElement.addEventListener("click", (e) => {
             pageDialogEle.appendChild(deleteTodoEle);
             pageDialogEle.showModal();
         }
-    } else if (target.type === "checkbox") { // Is complete checkbox
-        let title = e.target.parentElement.parentElement.firstElementChild.innerText;
-        let todo = currentProject.getTodoByTitle(title);
+    } else if (target.type === "checkbox") { // "Is Complete" checkbox
         todo.setIsComplete(target.checked);
     }
 });
