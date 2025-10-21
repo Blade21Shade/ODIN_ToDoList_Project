@@ -1,4 +1,5 @@
 import {Project} from "./project.js"
+import {Todo} from "./toDo.js"
 
 let pageDialogEle = document.querySelector("#page-dialog"); // This is used in a couple places, so it's being defined generally
 
@@ -91,6 +92,13 @@ function updateProjectInfoElement() {
     projectTitle.innerText = title;
     projectItemCount.innerText = itemCount;
 }
+
+let createNewItemButton = document.querySelector(".create-new-item-in-project-button");
+createNewItemButton.addEventListener("click", () => {
+    let newTodoForm = createEditViewTodoForm();
+    pageDialogEle.replaceChildren(newTodoForm);
+    pageDialogEle.showModal();
+});
 
 let orderItemsBy = document.querySelector("#orderItemsBy");
 orderItemsBy.addEventListener("change", () => {
@@ -188,7 +196,7 @@ function updateItemList() {
         // Description
         let descEle = document.createElement("div");
         descEle.classList.toggle("item-description");
-        descEle.innerText = item.getDescription();
+        descEle.innerText = "Description: " + item.getDescription();
         itemContainer.appendChild(descEle);
 
         // Buttons
@@ -215,122 +223,57 @@ itemListElement.addEventListener("click", (e) => {
         let todo = currentProject.getTodoByTitle(title);
         pageDialogEle.replaceChildren();
         if (target.innerText == "View/Edit") {
-            let viewEditForm = document.createElement("form");
-            viewEditForm.classList.toggle("view-edit-form");
-            // Info
-            let fieldsetInfo = document.createElement("fieldset");
-                // Title
-            let titleLabel = document.createElement("label");
-            titleLabel.htmlFor = "title";
-            titleLabel.innerText = "Title:";
-            fieldsetInfo.appendChild(titleLabel);
-            let title = document.createElement("input");
-            title.id = "title";
-            title.required = true;
+            let viewEditForm = createEditViewTodoForm();
+
+            // Fill the placeholder form values with the ones for this todo
+            let title = viewEditForm.querySelector("#title");
+            let priority = viewEditForm.querySelector("#priority");
+            let dueDate = viewEditForm.querySelector("#due-date");
+            let isComplete = viewEditForm.querySelector("#is-complete");
+            let description = viewEditForm.querySelector("#description");
+            let notes = viewEditForm.querySelector("#notes");
+
             title.value = todo.getTitle();
-            fieldsetInfo.appendChild(title);
-                // Priority
-            let prioLabel = document.createElement("label");
-            prioLabel.htmlFor = "priority";
-            prioLabel.innerText = "Priority:";
-            fieldsetInfo.appendChild(prioLabel);
-            let prio = document.createElement("select");
-            prio.id = "priority";
-            let currentPriority = todo.getPriority();
-            for (let i = 1; i < 11;i++) {
-                let priorityOption = document.createElement("option");
-                priorityOption.value = i;
-                priorityOption.innerText = `${i}`;
-                if (i === currentPriority) {
-                    priorityOption.selected = true;
-                }
-                prio.appendChild(priorityOption);
-            }
-            prio.required = true;
-            fieldsetInfo.appendChild(prio);
-                // Due date
-            let dateLabel = document.createElement("label");
-            dateLabel.htmlFor = "due-date";
-            dateLabel.innerText = "Due Date:";
-            fieldsetInfo.appendChild(dateLabel);
-            let dueDate = document.createElement("input");
-            dueDate.id = "due-date";
-            dueDate.type = "date";
-            dueDate.required = true;
-            let date = todo.getDueDate();
-            
-            dueDate.value = todo.getDueDate();
-            fieldsetInfo.appendChild(dueDate);
-                // Is complete
-            let isCompleteLabel = document.createElement("label");
-            isCompleteLabel.htmlFor = "is-complete";
-            isCompleteLabel.innerText = "Is Complete:";
-            fieldsetInfo.appendChild(isCompleteLabel);
-            let isComplete = document.createElement("input");
-            isComplete.id = "is-complete";
-            isComplete.type = "checkbox";
-            isComplete.value = todo.getIsComplete();
-            if (isComplete.value === "true") {
-                isComplete.checked = true;
-            }
-            fieldsetInfo.appendChild(isComplete);
 
-            viewEditForm.appendChild(fieldsetInfo);
-            // Desc and notes
-            let fieldsetDescNotes = document.createElement("fieldset");;
-                // Desc
-            let descLabel = document.createElement("label");
-            descLabel.htmlFor = "description";
-            descLabel.innerText = "Description";
-            fieldsetDescNotes.appendChild(descLabel);
-            let desc = document.createElement("textarea");
-            desc.id = "description";
-            desc.innerText = todo.getDescription();
-            fieldsetDescNotes.appendChild(desc);
-                // Notes
-            let notesLabel = document.createElement("label");
-            notesLabel.htmlFor = "notes";
-            notesLabel.innerText = "Notes";
-            fieldsetDescNotes.appendChild(notesLabel);
-            let notes = document.createElement("textarea");
-            notes.id = "notes";
-            notes.innerText = todo.getNotes();
-            fieldsetDescNotes.appendChild(notes);
-
-            viewEditForm.appendChild(fieldsetDescNotes);
-            // Buttons
-            let fieldsetButtons = document.createElement("fieldset");;
-                // Save changes
-            let saveButton = document.createElement("button");
-            saveButton.innerText = "Save Changes and Close";
-            saveButton.addEventListener("click", (e) => {
-                e.preventDefault();
-
-                todo.setTitle(title.value);
-                todo.setPriority(Number.parseFloat(prio.value));
-                todo.setDueDate(dueDate.value);
-                if (isComplete.checked === true) {
-                    todo.setIsComplete(true);
+            // Find the priority for this todo and pre select it for the form
+            let priorityToSelect = todo.getPriority();
+            let priorityList = priority.querySelectorAll("option");
+            for (const prio of priorityList) {
+                if (Number.parseFloat(prio.value) === priorityToSelect) {
+                    prio.selected = true;
                 } else {
-                    todo.setIsComplete(false);
+                    prio.selected = false;
                 }
-                todo.setDescription(desc.value);
-                todo.setNotes(notes.value);
+            }
 
-                updateItemList();
-                pageDialogEle.close();
-            });
-            fieldsetButtons.appendChild(saveButton);
-                // Discard changes
-            let discardButton = document.createElement("button");
-            discardButton.innerText = "Discard Changes and Close";
-            discardButton.addEventListener("click", (e) => {
-                e.preventDefault();
-                pageDialogEle.close();
-            });
-            fieldsetButtons.appendChild(discardButton);
+            dueDate.valueAsDate = todo.getDueDate(); // This shift from local time to utc time is corrected when the form is submitted
+            isComplete.checked = todo.getIsComplete();
 
-            viewEditForm.appendChild(fieldsetButtons);
+            description.innerText = todo.getDescription();
+            notes.innerText = todo.getNotes();
+
+            // Change the button text to make sense for a view/edit context instead of a create context
+            let saveButton = viewEditForm.querySelector("#save-button")
+            let discardBUtton = viewEditForm.querySelector("#discard-button");
+
+            saveButton.innerText = "Save Changes and Close";
+            discardBUtton.innerText = "Discard Changes and Close";
+
+            // The save button also needs its event listener updated because this todo already exists
+            saveButton.removeEventListener("click", saveButton.eventListener);
+            
+            function eventHandler(e) {
+                // dateAsValue saves the todo's local date as a UTC date, this corrects that value back to a local date for saving the todo
+                let dateVal = dueDate.valueAsDate;
+                let timezoneOffset = dateVal.getTimezoneOffset();
+                dateVal.setMinutes(timezoneOffset);
+                
+                let isCompleteVal = isComplete.checked === true ? true : false;
+                updateTodoFromForm(e, todo, title.value, description.value, notes.value, isCompleteVal, dateVal, Number.parseFloat(priority.value));
+            }
+
+            saveButton.eventListener = eventHandler;
+            saveButton.addEventListener("click", saveButton.eventListener);
             // Add to dialog
             pageDialogEle.appendChild(viewEditForm);
             pageDialogEle.showModal();
@@ -372,5 +315,143 @@ itemListElement.addEventListener("click", (e) => {
         todo.setIsComplete(target.checked);
     }
 });
+
+// Helper functions
+
+function createEditViewTodoForm() {
+    let viewEditForm = document.createElement("form");
+    viewEditForm.classList.toggle("view-edit-form");
+    // Info
+    let fieldsetInfo = document.createElement("fieldset");
+        // Title
+    let titleLabel = document.createElement("label");
+    titleLabel.htmlFor = "title";
+    titleLabel.innerText = "Title:";
+    fieldsetInfo.appendChild(titleLabel);
+    let title = document.createElement("input");
+    title.id = "title";
+    title.required = true;
+    title.value = "";
+    title.placeholder = "Title of the Todo";
+    fieldsetInfo.appendChild(title);
+        // Priority
+    let prioLabel = document.createElement("label");
+    prioLabel.htmlFor = "priority";
+    prioLabel.innerText = "Priority:";
+    fieldsetInfo.appendChild(prioLabel);
+    let prio = document.createElement("select");
+    prio.id = "priority";
+    let currentPriority = 1;
+    for (let i = 1; i < 11;i++) {
+        let priorityOption = document.createElement("option");
+        priorityOption.value = i;
+        priorityOption.innerText = `${i}`;
+        if (i === currentPriority) {
+            priorityOption.selected = true;
+        }
+        prio.appendChild(priorityOption);
+    }
+    prio.required = true;
+    fieldsetInfo.appendChild(prio);
+        // Due date
+    let dateLabel = document.createElement("label");
+    dateLabel.htmlFor = "due-date";
+    dateLabel.innerText = "Due Date:";
+    fieldsetInfo.appendChild(dateLabel);
+    let dueDate = document.createElement("input");
+    dueDate.id = "due-date";
+    dueDate.type = "date";
+    dueDate.valueAsDate = new Date();
+    dueDate.required = true;
+    fieldsetInfo.appendChild(dueDate);
+        // Is complete
+    let isCompleteLabel = document.createElement("label");
+    isCompleteLabel.htmlFor = "is-complete";
+    isCompleteLabel.innerText = "Is Complete:";
+    fieldsetInfo.appendChild(isCompleteLabel);
+    let isComplete = document.createElement("input");
+    isComplete.id = "is-complete";
+    isComplete.type = "checkbox";
+    isComplete.value = "false;"
+    fieldsetInfo.appendChild(isComplete);
+
+    viewEditForm.appendChild(fieldsetInfo);
+    // Desc and notes
+    let fieldsetDescNotes = document.createElement("fieldset");;
+        // Desc
+    let descLabel = document.createElement("label");
+    descLabel.htmlFor = "description";
+    descLabel.innerText = "Description";
+    fieldsetDescNotes.appendChild(descLabel);
+    let desc = document.createElement("textarea");
+    desc.id = "description";
+    desc.innerText = ""
+    desc.placeholder = "A brief description of this todo";
+    fieldsetDescNotes.appendChild(desc);
+        // Notes
+    let notesLabel = document.createElement("label");
+    notesLabel.htmlFor = "notes";
+    notesLabel.innerText = "Notes";
+    fieldsetDescNotes.appendChild(notesLabel);
+    let notes = document.createElement("textarea");
+    notes.id = "notes";
+    notes.innerText = "";
+    notes.placeholder = "Notes for this todo such as reminders, clarifications, or whatever else you want to write down.";
+    fieldsetDescNotes.appendChild(notes);
+
+    viewEditForm.appendChild(fieldsetDescNotes);
+    // Buttons
+    let fieldsetButtons = document.createElement("fieldset");;
+        // Save changes
+    let saveButton = document.createElement("button");
+    saveButton.id = "save-button";
+    saveButton.innerText = "Create todo";
+    let isCompleteVal = isComplete.checked === true ? true : false;
+
+    function eventHandler(e) {
+        createTodoFromForm(e, title.value, desc.value, notes.value, isCompleteVal, dueDate.valueAsDate, Number.parseFloat(prio.value));
+    }
+
+    saveButton.eventListener = eventHandler;
+    saveButton.addEventListener("click", saveButton.eventListener);
+
+    fieldsetButtons.appendChild(saveButton);
+        // Discard changes
+    let discardButton = document.createElement("button");
+    discardButton.id = "discard-button";
+    discardButton.innerText = "Close without creating todo";
+    discardButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        pageDialogEle.close();
+    });
+    fieldsetButtons.appendChild(discardButton);
+
+    viewEditForm.appendChild(fieldsetButtons);
+
+    return viewEditForm;
+}
+
+function createTodoFromForm(event, title, description, notes, isComplete, dueDate, priority) {
+    event.preventDefault();
+
+    let todo = new Todo(title, description, notes, isComplete, dueDate, priority);
+    currentProject.addNewTodoToProject(todo);
+    updateItemList();
+    pageDialogEle.close();
+}
+
+function updateTodoFromForm(event, todo, title, description, notes, isComplete, dueDate, priority) {
+    event.preventDefault();
+
+    todo.setTitle(title);
+    todo.setDescription(description);
+    todo.setNotes(notes);
+    todo.setIsComplete(isComplete);
+    todo.setDueDate(dueDate);
+    todo.setPriority(priority);
+
+    updateItemList();
+    pageDialogEle.close();
+}
 
 export {fillInProjectSideBar, initializeDom}
