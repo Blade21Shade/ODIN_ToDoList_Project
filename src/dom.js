@@ -173,8 +173,39 @@ function updateItemList() {
 
         let prioEle = document.createElement("div");
         prioEle.innerText = "Priority: " + item.getPriority();
+        
         let dueDateEle = document.createElement("div");
-        dueDateEle.innerText = "Due Date: " + item.getDueDate();
+        let date = item.getDueDate();
+        let year = date.getFullYear();
+        let month = date.getMonth();
+        let day = date.getDate();
+        let dayOfWeek = date.getDay();
+        let dayOfWeekText;
+        switch (dayOfWeek) {
+            case 0:
+                dayOfWeekText = "Sunday";
+                break;
+            case 1:
+                dayOfWeekText = "Monday";
+                break;
+            case 2:
+                dayOfWeekText = "Tuesday";
+                break;
+            case 3:
+                dayOfWeekText = "Wednesday";
+                break;
+            case 4:
+                dayOfWeekText = "Thursday";
+                break;
+            case 5:
+                dayOfWeekText = "Friday";
+                break;
+            case 6:
+                dayOfWeekText = "Saturday";
+                break;
+        }
+        
+        dueDateEle.innerText = `Due Date: ${dayOfWeekText} ${month+1}/${day}/${year}`;
         
         let isCompleteContainer = document.createElement("div");
         isCompleteContainer.classList.toggle("item-is-complete-container");
