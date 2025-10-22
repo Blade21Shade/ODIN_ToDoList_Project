@@ -92,12 +92,20 @@ function updateProjectInfoElement() {
     projectTitle.innerText = title;
     projectItemCount.innerText = itemCount;
 }
-
+    // Event listeners for the info element, in order of left to right on page
 let createNewItemButton = document.querySelector(".create-new-item-in-project-button");
 createNewItemButton.addEventListener("click", () => {
     let newTodoForm = createEditViewTodoForm();
     pageDialogEle.replaceChildren(newTodoForm);
     pageDialogEle.showModal();
+});
+
+let viewProjectDetailsButton = document.querySelector(".view-edit-project-button");
+viewProjectDetailsButton.addEventListener("click", () => {
+    let viewProjectDetailsForm = createEditViewProjectForm();
+    pageDialogEle.replaceChildren(viewProjectDetailsForm);
+    pageDialogEle.showModal();
+
 });
 
 let deleteProjectButton = document.querySelector(".delete-project-button");
@@ -474,15 +482,19 @@ function createDeleteProjectForm() {
 
     // Message asking message if they want to delete
     let areYouSure = document.createElement("div");
+    areYouSure.id = "are-you-sure"
     areYouSure.innerText = "Are you sure you want to delete this project?";
     form.appendChild(areYouSure);
 
     // Project info
     let projectInfoContainer = document.createElement("div");
+    projectInfoContainer.id = "project-info-container";
     let titleEle = document.createElement("div");
+    titleEle.id = "title";
     titleEle.innerText = "Project Title: " + currentProject.getTitle();
     projectInfoContainer.appendChild(titleEle);
     let itemCountEle = document.createElement("div");
+    itemCountEle.id = "item-count";
     itemCountEle.innerText = "Item Count: " + currentProject.getItemCount();
     projectInfoContainer.appendChild(itemCountEle);
     form.appendChild(projectInfoContainer);
@@ -512,6 +524,58 @@ function createDeleteProjectForm() {
     });
     buttonContainer.appendChild(cancelButton);
     form.appendChild(buttonContainer);
+
+    return form;
+}
+
+function createEditViewProjectForm() {
+    let form = document.createElement("form");
+
+    // Project info
+    let projectInfoFieldset = document.createElement("fieldset");
+    projectInfoFieldset.id = "project-info-container";
+
+    let titleEleLabel = document.createElement("label");
+    titleEleLabel.htmlFor = "title";
+    titleEleLabel.innerText = "Project Title: ";
+    projectInfoFieldset.appendChild(titleEleLabel);
+    let titleEle = document.createElement("input");
+    titleEle.id = "title";
+    titleEle.placeholder = "A title for this project";
+    titleEle.value = currentProject.getTitle();
+    projectInfoFieldset.appendChild(titleEle);
+    
+    let itemCountEle = document.createElement("div");
+    itemCountEle.id = "item-count";
+    itemCountEle.innerText = "Item Count: " + currentProject.getItemCount();
+    projectInfoFieldset.appendChild(itemCountEle);
+    form.appendChild(projectInfoFieldset);
+
+    // Buttons
+    let fieldsetButtons = document.createElement("fieldset");
+    fieldsetButtons.id = "fieldset-buttons";
+        // Save Changes
+    let saveButton = document.createElement("button");
+    saveButton.id = "save-button";
+    saveButton.innerText = "Save changes and close";
+    saveButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        currentProject.setTitle(titleEle.value);
+        fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
+        updateProjectInfoElement();
+        pageDialogEle.close();
+    });
+    fieldsetButtons.appendChild(saveButton);
+        // Discard changes
+    let discardButton = document.createElement("button");
+    discardButton.id = "discard-button";
+    discardButton.innerText = "Close without saving changes";
+    discardButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        pageDialogEle.close();
+    });
+    fieldsetButtons.appendChild(discardButton);
+    form.appendChild(fieldsetButtons);
 
     return form;
 }
