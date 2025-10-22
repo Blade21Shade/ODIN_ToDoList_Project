@@ -2,7 +2,7 @@ export class Project {
     static #projectArray = []; // Holds all the projects created by the user, DOM manipulation will use this
     static #projectArrayCount = 0;
 
-    static getProjectFromProjectArray(projectTitle) {
+    static getProjectFromProjectArrayByTitle(projectTitle) {
         for (let i = 0; i < Project.#projectArray.length; i++) {
             if (projectTitle === Project.#projectArray[i].getTitle()) {
                 return Project.#projectArray[i];
@@ -11,7 +11,7 @@ export class Project {
         console.log(`Couldn't find project with title ${projectTitleToRemove} when attempting to retrieve a project`);
     }
     
-    static removeProjectFromProjectArray(projectTitleToRemove) {
+    static removeProjectFromProjectArrayByTitle(projectTitleToRemove) {
         for (let i = 0; i < Project.#projectArray.length; i++) {
             if (projectTitleToRemove === Project.#projectArray[i].getTitle()) {
                 Project.#projectArray.splice(i, 1);

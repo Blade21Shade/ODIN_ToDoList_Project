@@ -27,7 +27,7 @@ projectSidebar.addEventListener("click", (e) => {
         selectedProject = {title: "All Projects", itemCount: Project.getProjectArrayCount(), id: "project-list-view"};
     } else {
         let projectTitle = selector.firstElementChild.innerText;
-        selectedProject = Project.getProjectFromProjectArray(projectTitle);
+        selectedProject = Project.getProjectFromProjectArrayByTitle(projectTitle);
     }
     updateCurrentProject(selectedProject);
     updateProjectInfoElement();
@@ -97,6 +97,13 @@ let createNewItemButton = document.querySelector(".create-new-item-in-project-bu
 createNewItemButton.addEventListener("click", () => {
     let newTodoForm = createEditViewTodoForm();
     pageDialogEle.replaceChildren(newTodoForm);
+    pageDialogEle.showModal();
+});
+
+let deleteProjectButton = document.querySelector(".delete-project-button");
+deleteProjectButton.addEventListener("click", () => {
+    let deleteProjectForm = createDeleteProjectForm();
+    pageDialogEle.replaceChildren(deleteProjectForm);
     pageDialogEle.showModal();
 });
 
@@ -460,6 +467,53 @@ function createEditViewTodoForm() {
     viewEditForm.appendChild(fieldsetButtons);
 
     return viewEditForm;
+}
+
+function createDeleteProjectForm() {
+    let form = document.createElement("form");
+
+    // Message asking message if they want to delete
+    let areYouSure = document.createElement("div");
+    areYouSure.innerText = "Are you sure you want to delete this project?";
+    form.appendChild(areYouSure);
+
+    // Project info
+    let projectInfoContainer = document.createElement("div");
+    let titleEle = document.createElement("div");
+    titleEle.innerText = "Project Title: " + currentProject.getTitle();
+    projectInfoContainer.appendChild(titleEle);
+    let itemCountEle = document.createElement("div");
+    itemCountEle.innerText = "Item Count: " + currentProject.getItemCount();
+    projectInfoContainer.appendChild(itemCountEle);
+    form.appendChild(projectInfoContainer);
+
+    // Confirm and cancel buttons
+    let buttonContainer = document.createElement("div");
+
+    let confirmButton = document.createElement("button");
+    confirmButton.innerText = "Delete Project";
+    confirmButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        Project.removeProjectFromProjectArrayByTitle(currentProject.getTitle());
+
+        fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
+        updateCurrentProject({title: "All Projects", itemCount: Project.getProjectArrayCount(), id: "project-list-view"});
+        updateProjectInfoElement();
+        
+        pageDialogEle.close();
+    });
+    buttonContainer.appendChild(confirmButton);
+
+    let cancelButton = document.createElement("button");
+    cancelButton.innerText = "Cancel Deleting Project";
+    cancelButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        pageDialogEle.close();
+    });
+    buttonContainer.appendChild(cancelButton);
+    form.appendChild(buttonContainer);
+
+    return form;
 }
 
 function createTodoFromForm(event, title, description, notes, isComplete, dueDate, priority) {
