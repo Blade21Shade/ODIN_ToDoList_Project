@@ -85,9 +85,17 @@ function updateProjectInfoElement() {
     if (currentProject.id === "project-list-view") {
         title = currentProject.title;
         itemCount = currentProject.itemCount;
+        createNewItemButton.innerText = "Create New Project";
+        viewProjectDetailsButton.innerText = "View Project Details";
+        deleteProjectButton.hidden = true;
+        orderItemsByContainer.hidden = true;
     } else {
         title = currentProject.getTitle();
         itemCount = currentProject.getItemCount();
+        createNewItemButton.innerText = "Create New Item";
+        viewProjectDetailsButton.innerText = "View/Edit Project Details";
+        deleteProjectButton.hidden = false;
+        orderItemsByContainer.hidden = false;
     }
     projectTitle.innerText = title;
     projectItemCount.innerText = itemCount;
@@ -125,6 +133,7 @@ deleteProjectButton.addEventListener("click", () => {
     pageDialogEle.showModal();
 });
 
+let orderItemsByContainer = document.querySelector(".order-items-by-container"); // This is used elsewhere, but I'm grouping it here for consistency
 let orderItemsBy = document.querySelector("#orderItemsBy");
 orderItemsBy.addEventListener("change", () => {
     updateItemList();
