@@ -95,8 +95,13 @@ function updateProjectInfoElement() {
     // Event listeners for the info element, in order of left to right on page
 let createNewItemButton = document.querySelector(".create-new-item-in-project-button");
 createNewItemButton.addEventListener("click", () => {
-    let newTodoForm = createEditViewTodoForm();
-    pageDialogEle.replaceChildren(newTodoForm);
+    let newObjectForm;
+    if (currentProject.id === "project-list-view") { // All project view
+        newObjectForm = createNewProjectForm();
+    } else { // In an actual project
+        newObjectForm = createEditViewTodoForm();
+    }
+    pageDialogEle.replaceChildren(newObjectForm);
     pageDialogEle.showModal();
 });
 
@@ -340,6 +345,7 @@ itemListElement.addEventListener("click", (e) => {
                 currentProject.deleteTodoFromProject(title);
                 updateItemList();
                 updateProjectInfoElement();
+                fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
                 pageDialogEle.close();
             });
                 // Cancel delete
@@ -580,11 +586,87 @@ function createEditViewProjectForm() {
     return form;
 }
 
+function createNewProjectForm() {
+    let form = document.createElement("form");
+
+    // Title
+    let titleFieldset = document.createElement("fieldset");
+
+    let titleLabelEle = document.createElement("label");
+    titleLabelEle.innerText = "Title: ";
+    titleLabelEle.htmlFor = "title";
+    titleFieldset.appendChild(titleLabelEle);
+
+    let titleEle = document.createElement("input");
+    titleEle.id = "title";
+    titleEle.placeholder = "Title for this project";
+    titleFieldset.appendChild(titleEle);
+   
+    form.appendChild(titleFieldset);
+
+    // Buttons
+    let buttonFieldSet = document.createElement("fieldset");
+
+    let createButton = document.createElement("button");
+    createButton.innerText = "Create Project";
+    createButton.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        // See if a project with the given title already exists
+        let projectList = Project.getProjectArrayWithoutTodos();
+        let thisTitle = titleEle.value;
+        for (const proj of projectList) {
+            if (proj.title === thisTitle) {
+                alert("Project with this title already exists");
+                return;
+            }
+        }
+
+        // Make sure the title isn't blank
+        if (thisTitle.length === 0) {
+            alert("Project title cannot be blank");
+            return;
+        }
+
+        // Make sure the title isn't "All Projects" to prevent confusion
+        if (thisTitle.toLocaleLowerCase() === "all projects") {
+            alert('Project Title cannot be "All Projects"');
+            return;
+        }
+
+        // Valid new title - Create project
+        let thisProj = new Project(thisTitle);
+
+        // Update page and open the new project
+        fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
+        updateCurrentProject(thisProj);
+        updateProjectInfoElement();
+        updateItemList();
+
+
+        pageDialogEle.close();
+    });
+    buttonFieldSet.appendChild(createButton);
+
+    let cancelButton = document.createElement("button");
+    cancelButton.innerText = "Cancel";
+    cancelButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        pageDialogEle.close();
+    });
+    buttonFieldSet.appendChild(cancelButton);
+
+    form.appendChild(buttonFieldSet);
+
+    return form;
+}
+
 function createTodoFromForm(event, title, description, notes, isComplete, dueDate, priority) {
     event.preventDefault();
 
     let todo = new Todo(title, description, notes, isComplete, dueDate, priority);
     currentProject.addNewTodoToProject(todo);
+    fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
     updateItemList();
     pageDialogEle.close();
 }
