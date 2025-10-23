@@ -107,7 +107,12 @@ createNewItemButton.addEventListener("click", () => {
 
 let viewProjectDetailsButton = document.querySelector(".view-edit-project-button");
 viewProjectDetailsButton.addEventListener("click", () => {
-    let viewProjectDetailsForm = createEditViewProjectForm();
+    let viewProjectDetailsForm;
+    if (currentProject.id === "project-list-view") { // All project view
+        viewProjectDetailsForm = createAllProjectsViewForm();
+    } else { // In an actual project
+        viewProjectDetailsForm = createEditViewProjectForm();
+    }
     pageDialogEle.replaceChildren(viewProjectDetailsForm);
     pageDialogEle.showModal();
 
@@ -657,6 +662,41 @@ function createNewProjectForm() {
     buttonFieldSet.appendChild(cancelButton);
 
     form.appendChild(buttonFieldSet);
+
+    return form;
+}
+
+function createAllProjectsViewForm() {
+    let form = document.createElement("form");
+
+    // View all projects
+    let projectList = Project.getProjectArrayWithoutTodos();
+    for (const proj of projectList) {
+        let fieldset = document.createElement("fieldset");
+        
+        let titleEle = document.createElement("div");
+        titleEle.innerText = "Title: " + proj.title;
+        fieldset.appendChild(titleEle);
+        
+        let itemCountEle = document.createElement("div");
+        itemCountEle.innerText = "Item Count: " + proj.itemCount;
+        fieldset.appendChild(itemCountEle);
+
+        form.appendChild(fieldset);
+    }
+
+    // Close button
+    let buttonFieldset = document.createElement("fieldset");
+
+    let closeButton = document.createElement("button");
+    closeButton.innerText = "Close";
+    closeButton.addEventListener("click", (e) => {
+        e.preventDefault;
+        pageDialogEle.close();
+    });
+    buttonFieldset.appendChild(closeButton);
+
+    form.appendChild(buttonFieldset);
 
     return form;
 }
