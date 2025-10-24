@@ -63,12 +63,51 @@ body {
 
 /* Item list */
 .item-list {
-    overflow: auto;
+    overflow-y: auto;
 
     display: grid;
+
+    grid-template-columns: repeat(auto-fill, 33%);
+    grid-auto-rows: 30%;
+
     gap: 5px;
 }
 
 .item-container, .item-project-container {
     border: 1px solid black;
+}
+
+.item-container {
+    display: grid;
+    grid-template-rows: repeat(4, 25%);
+}
+
+.item-title {
+    justify-self: center;
+    font-size: 1.5rem;
+}
+
+.item-due-data-container, .item-description {
+    margin: 0px 5px;
+}
+
+.item-due-data-container {
+    display: grid;
+    grid-template-columns: repeat(3, 33%);
+}
+
+.item-description {
+    overflow: hidden;
+}
+
+.item-container .button-container {
+    margin: 5px 5px;
+    
+    display: grid;
+    grid-template-columns: repeat(2, 50%);
+    justify-items: center;
+}
+
+.button-container .view-edit-button, .button-container .delete-button {
+    width: 70%;
 }

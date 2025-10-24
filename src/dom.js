@@ -270,8 +270,10 @@ function updateItemList() {
         
         let viewEditButton = document.createElement("button");
         viewEditButton.innerText = "View/Edit";
+        viewEditButton.classList.toggle("view-edit-button");
         let deleteButton = document.createElement("button");
         deleteButton.innerText = "Delete";
+        deleteButton.classList.toggle("delete-button");
 
         btnContainer.append(viewEditButton, deleteButton);
         itemContainer.appendChild(btnContainer);
