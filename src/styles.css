@@ -111,3 +111,38 @@ body {
 .button-container .view-edit-button, .button-container .delete-button {
     width: 70%;
 }
+
+/* Form styling */
+.view-edit-todo-form {
+    width: 50vw;
+    height: 50vh;
+
+    display: grid;
+    grid-template-rows: 30% 60% 10%;
+}
+
+.view-edit-todo-form .fieldset-info {
+    display: grid;
+    grid-template-rows: repeat(4, 25%);
+    gap: 2px;
+}
+
+.view-edit-todo-form .fieldset-desc-notes {
+    display: grid;
+    grid-template-columns: repeat(2, 45%);
+    grid-template-rows: 10% 90%;
+
+    column-gap: 20px;
+}
+
+.view-edit-todo-form .fieldset-desc-notes textarea {
+    resize: none;
+}
+
+
+.view-edit-todo-form .fieldset-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 45%);
+
+    gap: 20px;
+}

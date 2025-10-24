@@ -388,25 +388,31 @@ itemListElement.addEventListener("click", (e) => {
 
 function createEditViewTodoForm() {
     let viewEditForm = document.createElement("form");
-    viewEditForm.classList.toggle("view-edit-form");
+    viewEditForm.classList.toggle("view-edit-todo-form");
     // Info
     let fieldsetInfo = document.createElement("fieldset");
+    fieldsetInfo.classList.toggle("fieldset-info");
         // Title
+    let titleContainer = document.createElement("div");
+    titleContainer.classList.toggle("title-container");
     let titleLabel = document.createElement("label");
     titleLabel.htmlFor = "title";
     titleLabel.innerText = "Title:";
-    fieldsetInfo.appendChild(titleLabel);
+    titleContainer.appendChild(titleLabel);
     let title = document.createElement("input");
     title.id = "title";
     title.required = true;
     title.value = "";
     title.placeholder = "Title of the Todo";
-    fieldsetInfo.appendChild(title);
+    titleContainer.appendChild(title);
+    fieldsetInfo.appendChild(titleContainer);
         // Priority
+    let prioContainer = document.createElement("div");
+    prioContainer.classList.toggle("prio-container");
     let prioLabel = document.createElement("label");
     prioLabel.htmlFor = "priority";
     prioLabel.innerText = "Priority:";
-    fieldsetInfo.appendChild(prioLabel);
+    prioContainer.appendChild(prioLabel);
     let prio = document.createElement("select");
     prio.id = "priority";
     let currentPriority = 1;
@@ -420,47 +426,56 @@ function createEditViewTodoForm() {
         prio.appendChild(priorityOption);
     }
     prio.required = true;
-    fieldsetInfo.appendChild(prio);
+    prioContainer.appendChild(prio);
+    fieldsetInfo.appendChild(prioContainer);
         // Due date
+    let dueDateContainer = document.createElement("div");
+    dueDateContainer.classList.toggle("due-date-container");
     let dateLabel = document.createElement("label");
     dateLabel.htmlFor = "due-date";
     dateLabel.innerText = "Due Date:";
-    fieldsetInfo.appendChild(dateLabel);
+    dueDateContainer.appendChild(dateLabel);
     let dueDate = document.createElement("input");
     dueDate.id = "due-date";
     dueDate.type = "date";
     dueDate.valueAsDate = new Date();
     dueDate.required = true;
-    fieldsetInfo.appendChild(dueDate);
+    dueDateContainer.appendChild(dueDate);
+    fieldsetInfo.appendChild(dueDateContainer);
         // Is complete
+    let isCompleteContainer = document.createElement("div");
+    isCompleteContainer.classList.toggle("is-complete-container");
     let isCompleteLabel = document.createElement("label");
     isCompleteLabel.htmlFor = "is-complete";
     isCompleteLabel.innerText = "Is Complete:";
-    fieldsetInfo.appendChild(isCompleteLabel);
+    isCompleteContainer.appendChild(isCompleteLabel);
     let isComplete = document.createElement("input");
     isComplete.id = "is-complete";
     isComplete.type = "checkbox";
     isComplete.value = "false;"
-    fieldsetInfo.appendChild(isComplete);
+    isCompleteContainer.appendChild(isComplete);
+    fieldsetInfo.appendChild(isCompleteContainer);
 
     viewEditForm.appendChild(fieldsetInfo);
     // Desc and notes
-    let fieldsetDescNotes = document.createElement("fieldset");;
-        // Desc
+    let fieldsetDescNotes = document.createElement("fieldset");
+    fieldsetDescNotes.classList.toggle("fieldset-desc-notes");
+        // Labels (Put here for styling purposes)
     let descLabel = document.createElement("label");
     descLabel.htmlFor = "description";
     descLabel.innerText = "Description";
     fieldsetDescNotes.appendChild(descLabel);
+    let notesLabel = document.createElement("label");
+    notesLabel.htmlFor = "notes";
+    notesLabel.innerText = "Notes";
+    fieldsetDescNotes.appendChild(notesLabel);
+            //  Desc
     let desc = document.createElement("textarea");
     desc.id = "description";
     desc.innerText = ""
     desc.placeholder = "A brief description of this todo";
     fieldsetDescNotes.appendChild(desc);
-        // Notes
-    let notesLabel = document.createElement("label");
-    notesLabel.htmlFor = "notes";
-    notesLabel.innerText = "Notes";
-    fieldsetDescNotes.appendChild(notesLabel);
+            // Notes
     let notes = document.createElement("textarea");
     notes.id = "notes";
     notes.innerText = "";
@@ -469,7 +484,8 @@ function createEditViewTodoForm() {
 
     viewEditForm.appendChild(fieldsetDescNotes);
     // Buttons
-    let fieldsetButtons = document.createElement("fieldset");;
+    let fieldsetButtons = document.createElement("fieldset");
+    fieldsetButtons.classList.toggle("fieldset-buttons");
         // Save changes
     let saveButton = document.createElement("button");
     saveButton.id = "save-button";
@@ -501,6 +517,7 @@ function createEditViewTodoForm() {
 
 function createDeleteProjectForm() {
     let form = document.createElement("form");
+    form.classList.toggle("delete-project-form");
 
     // Message asking message if they want to delete
     let areYouSure = document.createElement("div");
@@ -552,6 +569,7 @@ function createDeleteProjectForm() {
 
 function createEditViewProjectForm() {
     let form = document.createElement("form");
+    form.classList.toggle("edit-view-project-form");
 
     // Project info
     let projectInfoFieldset = document.createElement("fieldset");
@@ -604,6 +622,7 @@ function createEditViewProjectForm() {
 
 function createNewProjectForm() {
     let form = document.createElement("form");
+    form.classList.toggle("new-project-form");
 
     // Title
     let titleFieldset = document.createElement("fieldset");
