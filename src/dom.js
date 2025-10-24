@@ -164,7 +164,7 @@ function updateItemList() {
             // Item Count
             let countEle = document.createElement("div");
             countEle.classList.toggle("item-project-count")
-            countEle.innerText = project.itemCount;
+            countEle.innerText = "Item Count: " + project.itemCount;
             itemContainer.appendChild(countEle);
 
             // Add to item list
