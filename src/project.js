@@ -249,6 +249,9 @@ export class Project {
     }
 
     #getDueDateDifferenceBetweenTodos(todoInProject, newTodo) {
-        return todoInProject.getDueDate().getTime() - newTodo.getDueDate().getTime();
+        let todoInProjectDate = new Date(todoInProject.getDueDate());
+        let newTodoDate = new Date(newTodo.getDueDate());
+
+        return todoInProjectDate.getTime() - newTodoDate.getTime();
     }
 }

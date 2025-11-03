@@ -209,7 +209,7 @@ function updateItemList() {
         prioEle.innerText = "Priority: " + item.getPriority();
         
         let dueDateEle = document.createElement("div");
-        let date = item.getDueDate();
+        let date = new Date(item.getDueDate());
         let year = date.getFullYear();
         let month = date.getMonth();
         let day = date.getDate();
@@ -313,7 +313,7 @@ itemListElement.addEventListener("click", (e) => {
                 }
             }
 
-            dueDate.valueAsDate = todo.getDueDate(); // This shift from local time to utc time is corrected when the form is submitted
+            dueDate.valueAsDate = new Date(todo.getDueDate()); // This shift from local time to utc time is corrected when the form is submitted
             isComplete.checked = todo.getIsComplete();
 
             description.innerText = todo.getDescription();
