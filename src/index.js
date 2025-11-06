@@ -65,10 +65,309 @@ for (let i = 0; i < todos.length; i++) {
     currentProject.addNewTodoToProject(realTodo);
 }
 
+// Event listeners for dom.js
+    // Side bar
+DomManipulation.projectSidebar.addEventListener("click", (e) => {
+    let clickedElement = e.target;
+    if (clickedElement.classList.contains("project-sidebar")) { // If the user clicked within the sidebar but not on a project do nothing
+        return;
+    }
+    
+    let selector = clickedElement.parentElement;
+    let selectedProject;
 
-// DOM Manipulation
+    if (selector.id === "project-list-view") { // The All Project view needs some special functionality to work
+        selectedProject = {title: "All Projects", itemCount: Project.getProjectArrayCount(), id: "project-list-view"};
+    } else {
+        let projectTitle = selector.firstElementChild.innerText;
+        selectedProject = Project.getProjectFromProjectArrayByTitle(projectTitle);
+    }
+    DomManipulation.updateCurrentProject(selectedProject);
+    DomManipulation.updateProjectInfoElement();
+    DomManipulation.updateItemList();
+});
+
+    // Project info
+    // Order is left to right on page
+DomManipulation.createNewItemButton.addEventListener("click", () => {
+    let newObjectForm;
+    if (DomManipulation.currentProject.id === "project-list-view") { // All project view
+        newObjectForm = DomManipulation.createNewProjectForm();
+
+        let createButton = newObjectForm.querySelector(".create-button");
+        createButton.addEventListener("click", (e) => {
+            e.preventDefault();
+    
+            // See if a project with the given title already exists
+            let projectList = Project.getProjectArrayWithoutTodos();
+            let titleEle = newObjectForm.querySelector("#title");
+            let thisTitle = titleEle.value;
+            for (const proj of projectList) {
+                if (proj.title === thisTitle) {
+                    alert("Project with this title already exists");
+                    return;
+                }
+            }
+    
+            // Make sure the title isn't blank
+            if (thisTitle.length === 0) {
+                alert("Project title cannot be blank");
+                return;
+            }
+    
+            // Make sure the title isn't "All Projects" to prevent confusion
+            if (thisTitle.toLocaleLowerCase() === "all projects") {
+                alert('Project Title cannot be "All Projects"');
+                return;
+            }
+    
+            // Valid new title - Create project
+            let thisProj = new Project(thisTitle);
+    
+            // Update page and open the new project
+            DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
+            DomManipulation.updateCurrentProject(thisProj);
+            DomManipulation.updateProjectInfoElement();
+            DomManipulation.updateItemList();
+    
+            DomManipulation.pageDialogEle.close();
+        });
+
+        let cancelButton = newObjectForm.querySelector(".cancel-button");
+        cancelButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            DomManipulation.pageDialogEle.close();
+        });
+
+    } else { // In an actual project
+        newObjectForm = DomManipulation.createEditViewTodoForm();
+            // Save button
+        let saveButton = newObjectForm.querySelector("#save-button");
+
+        function eventHandler(e) {
+            let title = newObjectForm.querySelector("#title");
+            let desc = newObjectForm.querySelector("#description");
+            let notes = newObjectForm.querySelector("#notes");
+            let isComplete = newObjectForm.querySelector("#is-complete");
+            let dueDate = newObjectForm.querySelector("#due-date");
+            let prio = newObjectForm.querySelector("#priority");
+
+            let isCompleteVal = isComplete.checked === true ? true : false;
+
+            createTodoFromForm(e, title.value, desc.value, notes.value, isCompleteVal, dueDate.valueAsDate, Number.parseFloat(prio.value));
+        }
+
+        saveButton.eventListener = eventHandler;
+        saveButton.addEventListener("click", saveButton.eventListener);
+
+            // Discard button
+        let discardButton = newObjectForm.querySelector("#discard-button");
+        discardButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            DomManipulation.pageDialogEle.close();
+        });
+
+    }
+    DomManipulation.pageDialogEle.replaceChildren(newObjectForm);
+    DomManipulation.pageDialogEle.showModal();
+});
+
+DomManipulation.viewProjectDetailsButton.addEventListener("click", () => {
+    let viewProjectDetailsForm;
+    if (DomManipulation.currentProject.id === "project-list-view") { // All project view
+        viewProjectDetailsForm = DomManipulation.createAllProjectsViewForm();
+
+        let closeButton = viewProjectDetailsForm.querySelector(".close-button");
+        closeButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            DomManipulation.pageDialogEle.close();
+        });
+    } else { // In an actual project
+        viewProjectDetailsForm = DomManipulation.createEditViewProjectForm();
+
+        let saveButton = viewProjectDetailsForm.querySelector("#save-button");
+        saveButton.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            let titleEle = viewProjectDetailsForm.querySelector("#title");
+            DomManipulation.currentProject.setTitle(titleEle.value);
+            DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
+            DomManipulation.updateProjectInfoElement();
+            DomManipulation.pageDialogEle.close();
+        });
+
+        let discardButton = viewProjectDetailsForm.querySelector("#discard-button");
+        discardButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            DomManipulation.pageDialogEle.close();
+        });
+    }
+    DomManipulation.pageDialogEle.replaceChildren(viewProjectDetailsForm);
+    DomManipulation.pageDialogEle.showModal();
+});
+
+DomManipulation.deleteProjectButton.addEventListener("click", () => {
+    let deleteProjectForm = DomManipulation.createDeleteProjectForm();
+
+    let confirmButton = deleteProjectForm.querySelector(".confirm-button");
+    confirmButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        Project.removeProjectFromProjectArrayByTitle(currentProject.getTitle());
+
+        DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
+        DomManipulation.updateCurrentProject({title: "All Projects", itemCount: Project.getProjectArrayCount(), id: "project-list-view"});
+        DomManipulation.updateProjectInfoElement();
+        
+        DomManipulation.pageDialogEle.close();
+    });
+
+    let cancelButton = deleteProjectForm.querySelector(".cancel-button");
+    cancelButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        DomManipulation.pageDialogEle.close();
+    });
+
+    DomManipulation.pageDialogEle.replaceChildren(deleteProjectForm);
+    DomManipulation.pageDialogEle.showModal();
+});
+
+DomManipulation.orderItemsBy.addEventListener("change", () => {
+    DomManipulation.updateItemList();
+})
+
+    // Item list element
+DomManipulation.itemListElement.addEventListener("click", (e) => {
+    let target = e.target;
+    if (target.type === "submit") { // button
+        let title = e.target.parentElement.parentElement.firstElementChild.innerText;
+        let todo = DomManipulation.currentProject.getTodoByTitle(title);
+        DomManipulation.pageDialogEle.replaceChildren();
+        if (target.innerText == "View/Edit") {
+            let viewEditForm = DomManipulation.createEditViewTodoForm();
+
+            // Fill the placeholder form values with the ones for this todo
+            let title = viewEditForm.querySelector("#title");
+            let priority = viewEditForm.querySelector("#priority");
+            let dueDate = viewEditForm.querySelector("#due-date");
+            let isComplete = viewEditForm.querySelector("#is-complete");
+            let description = viewEditForm.querySelector("#description");
+            let notes = viewEditForm.querySelector("#notes");
+
+            title.value = todo.getTitle();
+
+            // Find the priority for this todo and pre select it for the form
+            let priorityToSelect = todo.getPriority();
+            let priorityList = priority.querySelectorAll("option");
+            for (const prio of priorityList) {
+                if (Number.parseFloat(prio.value) === priorityToSelect) {
+                    prio.selected = true;
+                } else {
+                    prio.selected = false;
+                }
+            }
+
+            dueDate.valueAsDate = new Date(todo.getDueDate()); // This shift from local time to utc time is corrected when the form is submitted
+            isComplete.checked = todo.getIsComplete();
+
+            description.innerText = todo.getDescription();
+            notes.innerText = todo.getNotes();
+
+            // Change the button text to make sense for a view/edit context instead of a create context
+            let saveButton = viewEditForm.querySelector("#save-button")
+            let discardButton = viewEditForm.querySelector("#discard-button");
+
+            saveButton.innerText = "Save Changes and Close";
+            discardButton.innerText = "Discard Changes and Close";
+
+            // The save button also needs its event listener updated because this todo already exists
+            saveButton.removeEventListener("click", saveButton.eventListener);
+            
+            function eventHandler(e) {
+                // dateAsValue saves the todo's local date as a UTC date, this corrects that value back to a local date for saving the todo
+                let dateVal = dueDate.valueAsDate;
+                let timezoneOffset = dateVal.getTimezoneOffset();
+                dateVal.setMinutes(timezoneOffset);
+                
+                let isCompleteVal = isComplete.checked === true ? true : false;
+                updateTodoFromForm(e, todo, title.value, description.value, notes.value, isCompleteVal, dateVal, Number.parseFloat(priority.value));
+            }
+
+            saveButton.eventListener = eventHandler;
+            saveButton.addEventListener("click", saveButton.eventListener);
+
+            discardButton.addEventListener("click", (e) => {
+                e.preventDefault();
+                DomManipulation.pageDialogEle.close();
+            });
+
+            // Add to dialog
+            DomManipulation.pageDialogEle.appendChild(viewEditForm);
+            DomManipulation.pageDialogEle.showModal();
+        } else { // Delete button
+            let deleteTodoEle = document.createElement("div");
+            deleteTodoEle.classList.toggle("delete-todo-dialog");
+            
+            let areYouSure = document.createElement("div");
+            areYouSure.innerText = "Are you sure you want to delete this todo?"
+            deleteTodoEle.appendChild(areYouSure);
+            
+            // Buttons
+            let buttonContainer = document.createElement("div");
+                // Delete
+            let deleteButton = document.createElement("button");
+            deleteButton.innerText = "Yes";
+            deleteButton.addEventListener("click", () => {
+                DomManipulation.currentProject.deleteTodoFromProject(title);
+                DomManipulation.updateItemList();
+                DomManipulation.updateProjectInfoElement();
+                DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
+                DomManipulation.pageDialogEle.close();
+            });
+                // Cancel delete
+            let cancelButton = document.createElement("button");
+            cancelButton.innerText = "Cancel";
+            cancelButton.addEventListener("click", () => {
+                DomManipulation.pageDialogEle.close();
+            });
+            buttonContainer.append(deleteButton, cancelButton);
+            deleteTodoEle.appendChild(buttonContainer);
+
+            // Add to dialog
+            DomManipulation.pageDialogEle.appendChild(deleteTodoEle);
+            DomManipulation.pageDialogEle.showModal();
+        }
+    } else if (target.type === "checkbox") { // "Is Complete" checkbox
+        let title = e.target.parentElement.parentElement.parentElement.firstElementChild.innerText;
+        let todo = DomManipulation.currentProject.getTodoByTitle(title);
+        todo.setIsComplete(target.checked);
+    }
+});
+
+// EventHandler functions
+
+function createTodoFromForm(event, title, description, notes, isComplete, dueDate, priority) {
+    event.preventDefault();
+
+    let todo = new Todo(title, description, notes, isComplete, dueDate, priority);
+    DomManipulation.currentProject.addNewTodoToProject(todo);
+    DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
+    DomManipulation.updateItemList();
+    DomManipulation.pageDialogEle.close();
+}
+
+function updateTodoFromForm(event, todo, title, description, notes, isComplete, dueDate, priority) {
+    event.preventDefault();
+
+    todo.setTitle(title);
+    todo.setDescription(description);
+    todo.setNotes(notes);
+    todo.setIsComplete(isComplete);
+    todo.setDueDate(dueDate);
+    todo.setPriority(priority);
+
+    DomManipulation.updateItemList();
+    DomManipulation.pageDialogEle.close();
+}
+
+// DOM initial call
 DomManipulation.initializeDom(Project.getProjectArrayWithoutTodos(), Project.getProjectArrayCount());
-
-// LocalStorage.storeAllObjectsToLocal();
-
-let a = 1;
