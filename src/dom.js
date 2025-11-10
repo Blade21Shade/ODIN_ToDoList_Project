@@ -1,12 +1,9 @@
-import {Project} from "./project.js"
-
 let pageDialogEle = document.querySelector("#page-dialog"); // This is used in a couple places, so it's being defined generally
 
 // Initialization function
 function initializeDom(projectArrayWithoutTodos, projectCount) {
     fillInProjectSideBar(projectArrayWithoutTodos);
     let allProjectsViewObject = createAllProjectsViewObject(projectCount);
-    updateCurrentProject(allProjectsViewObject);
     updateProjectInfoElement();
     updateItemList(allProjectsViewObject, projectArrayWithoutTodos);
 }
@@ -48,30 +45,25 @@ function fillInProjectSideBar(projectsWithoutTodos) {
 }
 
 // Project Display Area
-let currentProject;
-
-function updateCurrentProject(thisProject) {
-    currentProject = thisProject;
-}
 
 // Project Info
 let projectInfoElement = document.querySelector(".project-info");
 let projectTitle = document.querySelector(".project-title")
 let projectItemCount = document.querySelector(".project-item-count");
 
-function updateProjectInfoElement() {
+function updateProjectInfoElement(projectPOJO) {
     let title;
     let itemCount;
-    if (currentProject.id === "project-list-view") {
-        title = currentProject.title;
-        itemCount = currentProject.itemCount;
+    if (projectPOJO.id === "project-list-view") {
+        title = projectPOJO.title;
+        itemCount = projectPOJO.itemCount;
         createNewItemButton.innerText = "Create New Project";
         viewProjectDetailsButton.innerText = "View Project Details";
         deleteProjectButton.hidden = true;
         orderItemsByContainer.hidden = true;
     } else {
-        title = currentProject.getTitle();
-        itemCount = currentProject.getItemCount();
+        title = projectPOJO.title;
+        itemCount = projectPOJO.title;
         createNewItemButton.innerText = "Create New Item";
         viewProjectDetailsButton.innerText = "View/Edit Project Details";
         deleteProjectButton.hidden = false;
@@ -336,7 +328,7 @@ function createEditViewTodoForm() {
     return viewEditForm;
 }
 
-function createDeleteProjectForm() {
+function createDeleteProjectForm(projectPOJO) {
     let form = document.createElement("form");
     form.classList.toggle("delete-project-form");
 
@@ -351,11 +343,11 @@ function createDeleteProjectForm() {
     projectInfoContainer.id = "project-info-container";
     let titleEle = document.createElement("div");
     titleEle.id = "title";
-    titleEle.innerText = "Project Title: " + currentProject.getTitle();
+    titleEle.innerText = "Project Title: " + projectPOJO.title;
     projectInfoContainer.appendChild(titleEle);
     let itemCountEle = document.createElement("div");
     itemCountEle.id = "item-count";
-    itemCountEle.innerText = "Item Count: " + currentProject.getItemCount();
+    itemCountEle.innerText = "Item Count: " + projectPOJO.itemCount;
     projectInfoContainer.appendChild(itemCountEle);
     form.appendChild(projectInfoContainer);
 
@@ -376,7 +368,7 @@ function createDeleteProjectForm() {
     return form;
 }
 
-function createEditViewProjectForm() {
+function createEditViewProjectForm(projectPOJO) {
     let form = document.createElement("form");
     form.classList.toggle("edit-view-project-form");
 
@@ -391,12 +383,12 @@ function createEditViewProjectForm() {
     let titleEle = document.createElement("input");
     titleEle.id = "title";
     titleEle.placeholder = "A title for this project";
-    titleEle.value = currentProject.getTitle();
+    titleEle.value = projectPOJO.title;
     projectInfoFieldset.appendChild(titleEle);
     
     let itemCountEle = document.createElement("div");
     itemCountEle.id = "item-count";
-    itemCountEle.innerText = "Item Count: " + currentProject.getItemCount();
+    itemCountEle.innerText = "Item Count: " + projectPOJO.itemCount;
     projectInfoFieldset.appendChild(itemCountEle);
     form.appendChild(projectInfoFieldset);
 
@@ -455,11 +447,10 @@ function createNewProjectForm() {
     return form;
 }
 
-function createAllProjectsViewForm() {
+function createAllProjectsViewForm(projectList) {
     let form = document.createElement("form");
 
     // View all projects
-    let projectList = Project.getProjectArrayWithoutTodos();
     for (const proj of projectList) {
         let fieldset = document.createElement("fieldset");
         
@@ -494,7 +485,7 @@ function createAllProjectsViewObject(projectCount) {
 }
 
 // Functions
-export {fillInProjectSideBar, initializeDom, updateProjectInfoElement, updateItemList, createEditViewTodoForm, createDeleteProjectForm, createEditViewProjectForm, createNewProjectForm, createAllProjectsViewForm, updateCurrentProject, createAllProjectsViewObject};
+export {fillInProjectSideBar, initializeDom, updateProjectInfoElement, updateItemList, createEditViewTodoForm, createDeleteProjectForm, createEditViewProjectForm, createNewProjectForm, createAllProjectsViewForm, createAllProjectsViewObject};
 
 // Variables (mostly DOM elements)
-export {pageDialogEle, projectSidebar, projectTitle, projectItemCount, createNewItemButton, viewProjectDetailsButton, deleteProjectButton, orderItemsByContainer, orderItemsBy, itemListElement, currentProject};
+export {pageDialogEle, projectSidebar, projectTitle, projectItemCount, createNewItemButton, viewProjectDetailsButton, deleteProjectButton, orderItemsByContainer, orderItemsBy, itemListElement};

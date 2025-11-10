@@ -81,18 +81,20 @@ DomManipulation.projectSidebar.addEventListener("click", (e) => {
     let selector = clickedElement.parentElement;
     let selectedProject;
     let itemList;
+    let projectPOJO;
 
     if (selector.id === "project-list-view") { // The All Project view needs some special functionality to work
         selectedProject = DomManipulation.createAllProjectsViewObject(Project.getProjectArrayCount());
+        projectPOJO = selectedProject; // Already an object
         itemList = Project.getProjectArrayWithoutTodos();
     } else {
         let projectTitle = selector.firstElementChild.innerText;
         selectedProject = Project.getProjectFromProjectArrayByTitle(projectTitle);
+        projectPOJO = createPOJOFromProject(selectedProject);
         itemList = getTodosAsObjectsByOrderedList(selectedProject);
     }
-    DomManipulation.updateCurrentProject(selectedProject);
     currentProject = selectedProject;
-    DomManipulation.updateProjectInfoElement();
+    DomManipulation.updateProjectInfoElement(projectPOJO);
     DomManipulation.updateItemList(selectedProject, itemList);
 });
 
@@ -100,7 +102,7 @@ DomManipulation.projectSidebar.addEventListener("click", (e) => {
     // Order is left to right on page
 DomManipulation.createNewItemButton.addEventListener("click", () => {
     let newObjectForm;
-    if (DomManipulation.currentProject.id === "project-list-view") { // All project view
+    if (currentProject.id === "project-list-view") { // All project view
         newObjectForm = DomManipulation.createNewProjectForm();
 
         let createButton = newObjectForm.querySelector(".create-button");
@@ -137,9 +139,9 @@ DomManipulation.createNewItemButton.addEventListener("click", () => {
             let itemList = getTodosAsObjectsByOrderedList(thisProj);
 
             DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
-            DomManipulation.updateCurrentProject(thisProj);
             currentProject = thisProj;
-            DomManipulation.updateProjectInfoElement();
+            let projectPOJO = createPOJOFromProject(currentProject);
+            DomManipulation.updateProjectInfoElement(projectPOJO);
             DomManipulation.updateItemList(thisProj, itemList);
     
             DomManipulation.pageDialogEle.close();
@@ -186,8 +188,8 @@ DomManipulation.createNewItemButton.addEventListener("click", () => {
 
 DomManipulation.viewProjectDetailsButton.addEventListener("click", () => {
     let viewProjectDetailsForm;
-    if (DomManipulation.currentProject.id === "project-list-view") { // All project view
-        viewProjectDetailsForm = DomManipulation.createAllProjectsViewForm();
+    if (currentProject.id === "project-list-view") { // All project view
+        viewProjectDetailsForm = DomManipulation.createAllProjectsViewForm(Project.getProjectArrayWithoutTodos());
 
         let closeButton = viewProjectDetailsForm.querySelector(".close-button");
         closeButton.addEventListener("click", (e) => {
@@ -195,16 +197,17 @@ DomManipulation.viewProjectDetailsButton.addEventListener("click", () => {
             DomManipulation.pageDialogEle.close();
         });
     } else { // In an actual project
-        viewProjectDetailsForm = DomManipulation.createEditViewProjectForm();
+        viewProjectDetailsForm = DomManipulation.createEditViewProjectForm(createPOJOFromProject(currentProject));
 
         let saveButton = viewProjectDetailsForm.querySelector("#save-button");
         saveButton.addEventListener("click", (e) => {
             e.preventDefault();
 
             let titleEle = viewProjectDetailsForm.querySelector("#title");
-            DomManipulation.currentProject.setTitle(titleEle.value);
+            currentProject.setTitle(titleEle.value);
             DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
-            DomManipulation.updateProjectInfoElement();
+            let projectPOJO = createPOJOFromProject(currentProject)
+            DomManipulation.updateProjectInfoElement(projectPOJO);
             DomManipulation.pageDialogEle.close();
         });
 
@@ -219,7 +222,7 @@ DomManipulation.viewProjectDetailsButton.addEventListener("click", () => {
 });
 
 DomManipulation.deleteProjectButton.addEventListener("click", () => {
-    let deleteProjectForm = DomManipulation.createDeleteProjectForm();
+    let deleteProjectForm = DomManipulation.createDeleteProjectForm(createPOJOFromProject(currentProject));
 
     let confirmButton = deleteProjectForm.querySelector(".confirm-button");
     confirmButton.addEventListener("click", (e) => {
@@ -227,8 +230,9 @@ DomManipulation.deleteProjectButton.addEventListener("click", () => {
         Project.removeProjectFromProjectArrayByTitle(currentProject.getTitle());
 
         DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
-        DomManipulation.updateCurrentProject(DomManipulation.createAllProjectsViewObject(Project.getProjectArrayCount()));
-        DomManipulation.updateProjectInfoElement();
+        currentProject = DomManipulation.createAllProjectsViewObject(Project.getProjectArrayCount());
+        let projectPOJO = currentProject; // For consistency
+        DomManipulation.updateProjectInfoElement(projectPOJO);
         
         DomManipulation.pageDialogEle.close();
     });
@@ -253,7 +257,7 @@ DomManipulation.itemListElement.addEventListener("click", (e) => {
     let target = e.target;
     if (target.type === "submit") { // button
         let title = e.target.parentElement.parentElement.firstElementChild.innerText;
-        let todo = DomManipulation.currentProject.getTodoByTitle(title);
+        let todo = currentProject.getTodoByTitle(title);
         DomManipulation.pageDialogEle.replaceChildren();
         if (target.innerText == "View/Edit") {
             let viewEditForm = DomManipulation.createEditViewTodoForm();
@@ -330,10 +334,11 @@ DomManipulation.itemListElement.addEventListener("click", (e) => {
             let deleteButton = document.createElement("button");
             deleteButton.innerText = "Yes";
             deleteButton.addEventListener("click", () => {
-                DomManipulation.currentProject.deleteTodoFromProject(title);
+                currentProject.deleteTodoFromProject(title);
                 let itemList = getTodosAsObjectsByOrderedList(currentProject);
                 DomManipulation.updateItemList(currentProject, itemList);
-                DomManipulation.updateProjectInfoElement();
+                let projectPOJO = createPOJOFromProject(currentProject);
+                DomManipulation.updateProjectInfoElement(projectPOJO);
                 DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
                 DomManipulation.pageDialogEle.close();
             });
@@ -352,7 +357,7 @@ DomManipulation.itemListElement.addEventListener("click", (e) => {
         }
     } else if (target.type === "checkbox") { // "Is Complete" checkbox
         let title = e.target.parentElement.parentElement.parentElement.firstElementChild.innerText;
-        let todo = DomManipulation.currentProject.getTodoByTitle(title);
+        let todo = currentProject.getTodoByTitle(title);
         todo.setIsComplete(target.checked);
     }
 });
@@ -363,7 +368,7 @@ function createTodoFromForm(event, title, description, notes, isComplete, dueDat
     event.preventDefault();
 
     let todo = new Todo(title, description, notes, isComplete, dueDate, priority);
-    DomManipulation.currentProject.addNewTodoToProject(todo);
+    currentProject.addNewTodoToProject(todo);
     DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
     let itemList = getTodosAsObjectsByOrderedList(currentProject);
     DomManipulation.updateItemList(currentProject, itemList);
@@ -423,6 +428,13 @@ function getTodosAsObjectsByOrderedList(project) {
     }
 
     return objectList;
+}
+
+function createPOJOFromProject(project) {
+    return {
+        title: project.getTitle(),
+        itemCount: project.getItemCount()
+    }
 }
 
 // DOM initial call
