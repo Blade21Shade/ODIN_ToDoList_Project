@@ -1,14 +1,14 @@
 import {Project} from "./project.js"
-import {Todo} from "./toDo.js"
 
 let pageDialogEle = document.querySelector("#page-dialog"); // This is used in a couple places, so it's being defined generally
 
 // Initialization function
 function initializeDom(projectArrayWithoutTodos, projectCount) {
     fillInProjectSideBar(projectArrayWithoutTodos);
-    updateCurrentProject({title: "All Projects", itemCount: projectCount, id: "project-list-view"});
+    let allProjectsViewObject = createAllProjectsViewObject(projectCount);
+    updateCurrentProject(allProjectsViewObject);
     updateProjectInfoElement();
-    updateItemList();
+    updateItemList(allProjectsViewObject, projectArrayWithoutTodos);
 }
 
 // Side bar
@@ -17,7 +17,7 @@ let projectSidebar = document.querySelector(".project-sidebar");
 function fillInProjectSideBar(projectsWithoutTodos) {
     projectSidebar.replaceChildren();
     
-    // All Project selector special logic
+    // All Projects view special logic
     const allProjects = document.createElement("div");
     allProjects.classList.toggle("project-selector");
     allProjects.id = "project-list-view";
@@ -93,13 +93,13 @@ let orderItemsBy = document.querySelector("#orderItemsBy");
 // Item list
 let itemListElement = document.querySelector(".item-list");
 
-function updateItemList() {
+function updateItemList(project, itemList) {
     itemListElement.replaceChildren();
 
-    if (currentProject.id === "project-list-view") { // View all projects
-        let projects = Project.getProjectArrayWithoutTodos();
+    // All Projects view logic
+    if (project.id === "project-list-view") {
 
-        for (const project of projects) {
+        for (const project of itemList) {
             let itemContainer = document.createElement("div");
             itemContainer.classList.toggle("item-project-container");
 
@@ -122,26 +122,7 @@ function updateItemList() {
         return; // Don't do regular item logic
     }
 
-    let itemList;
-    let orderBy = orderItemsBy.value;
-
-    switch(orderBy) {
-        case "entryOrder":
-        case "priority":
-        case "dueDate":
-            itemList = currentProject.getTodosByOrderedList(orderBy, false);
-            break;
-        case "entryOrderReverse":
-            itemList = currentProject.getTodosByOrderedList("entryOrder", true);
-            break;
-        case "priorityReverse":
-            itemList = currentProject.getTodosByOrderedList("priority", true);
-            break;
-        case "dueDateReverse":
-            itemList = currentProject.getTodosByOrderedList("dueDate", true);
-            break;
-    }
-
+    // Regular project logic
     for (const item of itemList) {
         let itemContainer = document.createElement("div");
         itemContainer.classList.toggle("item-container");
@@ -149,7 +130,7 @@ function updateItemList() {
         // Title
         let titleEle = document.createElement("div");
         titleEle.classList.toggle("item-title");
-        titleEle.innerText = item.getTitle();
+        titleEle.innerText = item.title;
         itemContainer.appendChild(titleEle);
 
         // Due data - Prio, due date, is complete
@@ -157,10 +138,10 @@ function updateItemList() {
         dueDataContainer.classList.toggle("item-due-data-container");
 
         let prioEle = document.createElement("div");
-        prioEle.innerText = "Priority: " + item.getPriority();
+        prioEle.innerText = "Priority: " + item.priority;
         
         let dueDateEle = document.createElement("div");
-        let date = new Date(item.getDueDate());
+        let date = new Date(item.dueDate);
         let year = date.getFullYear();
         let month = date.getMonth();
         let day = date.getDate();
@@ -196,7 +177,7 @@ function updateItemList() {
         isCompleteContainer.classList.toggle("item-is-complete-container");
         let isCompleteText = document.createElement("div");
         isCompleteText = "Is Complete "
-        let isComplete = item.getIsComplete();
+        let isComplete = item.isComplete;
         let isCompleteEle = document.createElement("input");
         isCompleteEle.type = "checkbox";
         if (isComplete) {
@@ -212,7 +193,7 @@ function updateItemList() {
         // Description
         let descEle = document.createElement("div");
         descEle.classList.toggle("item-description");
-        descEle.innerText = "Description: " + item.getDescription();
+        descEle.innerText = "Description: " + item.description;
         itemContainer.appendChild(descEle);
 
         // Buttons
@@ -234,7 +215,7 @@ function updateItemList() {
     }
 }
 
-// Helper functions
+// "Create form" functions
 
 function createEditViewTodoForm() {
     let viewEditForm = document.createElement("form");
@@ -500,10 +481,6 @@ function createAllProjectsViewForm() {
     let closeButton = document.createElement("button");
     closeButton.classList.toggle("close-button");
     closeButton.innerText = "Close";
-    // closeButton.addEventListener("click", (e) => {
-    //     e.preventDefault;
-    //     pageDialogEle.close();
-    // });
     buttonFieldset.appendChild(closeButton);
 
     form.appendChild(buttonFieldset);
@@ -511,8 +488,13 @@ function createAllProjectsViewForm() {
     return form;
 }
 
+// Helper functions
+function createAllProjectsViewObject(projectCount) {
+    return {title: "All Projects", itemCount: projectCount, id: "project-list-view"};
+}
+
 // Functions
-export {fillInProjectSideBar, initializeDom, updateProjectInfoElement, updateItemList, createEditViewTodoForm, createDeleteProjectForm, createEditViewProjectForm, createNewProjectForm, createAllProjectsViewForm, updateCurrentProject}
+export {fillInProjectSideBar, initializeDom, updateProjectInfoElement, updateItemList, createEditViewTodoForm, createDeleteProjectForm, createEditViewProjectForm, createNewProjectForm, createAllProjectsViewForm, updateCurrentProject, createAllProjectsViewObject};
 
 // Variables (mostly DOM elements)
-export {pageDialogEle, projectSidebar, projectTitle, projectItemCount, createNewItemButton, viewProjectDetailsButton, deleteProjectButton, orderItemsByContainer, orderItemsBy, itemListElement, currentProject}
+export {pageDialogEle, projectSidebar, projectTitle, projectItemCount, createNewItemButton, viewProjectDetailsButton, deleteProjectButton, orderItemsByContainer, orderItemsBy, itemListElement, currentProject};

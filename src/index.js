@@ -41,6 +41,9 @@ let todo7 = new Todo("Title7", "Desc", "No notes", false, dateArray[6], 3);
 // proj3.addNewTodoToProject(todo6);
 // proj3.addNewTodoToProject(todo7);
 
+// currentProject is used both in the loading from local storage process and during the logic for DomManipulation
+// so I'm defining it above both
+let currentProject;
 
 // Load todos and projects before loading DOM
 let {todos, projects} = LocalStorage.getAllObjectsFromLocal();
@@ -49,7 +52,6 @@ for (let i = 0; i < projects.length; i++) {
     new Project(projects[i]);
 }
 
-let currentProject;
 let currentProjectTitle = "";
 for (let i = 0; i < todos.length; i++) {
     let todoPOJO = todos[i];
@@ -65,6 +67,9 @@ for (let i = 0; i < todos.length; i++) {
     currentProject.addNewTodoToProject(realTodo);
 }
 
+// Reset for further logic
+currentProject = undefined;
+
 // Event listeners for dom.js
     // Side bar
 DomManipulation.projectSidebar.addEventListener("click", (e) => {
@@ -75,16 +80,20 @@ DomManipulation.projectSidebar.addEventListener("click", (e) => {
     
     let selector = clickedElement.parentElement;
     let selectedProject;
+    let itemList;
 
     if (selector.id === "project-list-view") { // The All Project view needs some special functionality to work
-        selectedProject = {title: "All Projects", itemCount: Project.getProjectArrayCount(), id: "project-list-view"};
+        selectedProject = DomManipulation.createAllProjectsViewObject(Project.getProjectArrayCount());
+        itemList = Project.getProjectArrayWithoutTodos();
     } else {
         let projectTitle = selector.firstElementChild.innerText;
         selectedProject = Project.getProjectFromProjectArrayByTitle(projectTitle);
+        itemList = getTodosAsObjectsByOrderedList(selectedProject);
     }
     DomManipulation.updateCurrentProject(selectedProject);
+    currentProject = selectedProject;
     DomManipulation.updateProjectInfoElement();
-    DomManipulation.updateItemList();
+    DomManipulation.updateItemList(selectedProject, itemList);
 });
 
     // Project info
@@ -125,10 +134,13 @@ DomManipulation.createNewItemButton.addEventListener("click", () => {
             let thisProj = new Project(thisTitle);
     
             // Update page and open the new project
+            let itemList = getTodosAsObjectsByOrderedList(thisProj);
+
             DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
             DomManipulation.updateCurrentProject(thisProj);
+            currentProject = thisProj;
             DomManipulation.updateProjectInfoElement();
-            DomManipulation.updateItemList();
+            DomManipulation.updateItemList(thisProj, itemList);
     
             DomManipulation.pageDialogEle.close();
         });
@@ -215,7 +227,7 @@ DomManipulation.deleteProjectButton.addEventListener("click", () => {
         Project.removeProjectFromProjectArrayByTitle(currentProject.getTitle());
 
         DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
-        DomManipulation.updateCurrentProject({title: "All Projects", itemCount: Project.getProjectArrayCount(), id: "project-list-view"});
+        DomManipulation.updateCurrentProject(DomManipulation.createAllProjectsViewObject(Project.getProjectArrayCount()));
         DomManipulation.updateProjectInfoElement();
         
         DomManipulation.pageDialogEle.close();
@@ -232,7 +244,8 @@ DomManipulation.deleteProjectButton.addEventListener("click", () => {
 });
 
 DomManipulation.orderItemsBy.addEventListener("change", () => {
-    DomManipulation.updateItemList();
+    let itemList = getTodosAsObjectsByOrderedList(currentProject);
+    DomManipulation.updateItemList(currentProject, itemList);
 })
 
     // Item list element
@@ -318,7 +331,8 @@ DomManipulation.itemListElement.addEventListener("click", (e) => {
             deleteButton.innerText = "Yes";
             deleteButton.addEventListener("click", () => {
                 DomManipulation.currentProject.deleteTodoFromProject(title);
-                DomManipulation.updateItemList();
+                let itemList = getTodosAsObjectsByOrderedList(currentProject);
+                DomManipulation.updateItemList(currentProject, itemList);
                 DomManipulation.updateProjectInfoElement();
                 DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
                 DomManipulation.pageDialogEle.close();
@@ -351,7 +365,8 @@ function createTodoFromForm(event, title, description, notes, isComplete, dueDat
     let todo = new Todo(title, description, notes, isComplete, dueDate, priority);
     DomManipulation.currentProject.addNewTodoToProject(todo);
     DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
-    DomManipulation.updateItemList();
+    let itemList = getTodosAsObjectsByOrderedList(currentProject);
+    DomManipulation.updateItemList(currentProject, itemList);
     DomManipulation.pageDialogEle.close();
 }
 
@@ -365,8 +380,49 @@ function updateTodoFromForm(event, todo, title, description, notes, isComplete, 
     todo.setDueDate(dueDate);
     todo.setPriority(priority);
 
-    DomManipulation.updateItemList();
+    let itemList = getTodosAsObjectsByOrderedList(currentProject);
+    DomManipulation.updateItemList(currentProject, itemList);
     DomManipulation.pageDialogEle.close();
+}
+
+// Helper functions
+
+// Gets todos as objects so dom.js doesn't have to import todo.js and can just reference object properties
+function getTodosAsObjectsByOrderedList(project) {
+    // Get Todo objects
+    let itemList;
+    let orderBy = orderItemsBy.value;
+    switch(orderBy) {
+        case "entryOrder":
+        case "priority":
+        case "dueDate":
+            itemList = project.getTodosByOrderedList(orderBy, false);
+            break;
+        case "entryOrderReverse":
+            itemList = project.getTodosByOrderedList("entryOrder", true);
+            break;
+        case "priorityReverse":
+            itemList = project.getTodosByOrderedList("priority", true);
+            break;
+        case "dueDateReverse":
+            itemList = project.getTodosByOrderedList("dueDate", true);
+            break;
+    }
+
+    // Turn todos into objects
+    let objectList = [];
+    for (const item of itemList) {
+        let object = {};
+        object.title = item.getTitle();
+        object.description = item.getDescription();
+        object.notes = item.getNotes();
+        object.dueDate = item.getDueDate();
+        object.priority = item.getPriority();
+        object.isComplete = item.getIsComplete();
+        objectList.push(object);
+    }
+
+    return objectList;
 }
 
 // DOM initial call
