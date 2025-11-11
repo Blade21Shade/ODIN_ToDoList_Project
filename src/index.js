@@ -68,7 +68,7 @@ for (let i = 0; i < todos.length; i++) {
 }
 
 // Reset for further logic
-currentProject = undefined;
+currentProject = DomManipulation.createAllProjectsViewObject(Project.getProjectArrayCount());
 
 // Event listeners for dom.js
     // Side bar
@@ -143,6 +143,8 @@ DomManipulation.createNewItemButton.addEventListener("click", () => {
             let projectPOJO = createPOJOFromProject(currentProject);
             DomManipulation.updateProjectInfoElement(projectPOJO);
             DomManipulation.updateItemList(thisProj, itemList);
+
+            LocalStorage.storeNewProjectInLocal(thisTitle);
     
             DomManipulation.pageDialogEle.close();
         });
@@ -204,10 +206,14 @@ DomManipulation.viewProjectDetailsButton.addEventListener("click", () => {
             e.preventDefault();
 
             let titleEle = viewProjectDetailsForm.querySelector("#title");
+            let oldTitle = currentProject.getTitle();
             currentProject.setTitle(titleEle.value);
             DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
             let projectPOJO = createPOJOFromProject(currentProject)
             DomManipulation.updateProjectInfoElement(projectPOJO);
+
+            LocalStorage.updateProjectInLocal(oldTitle, currentProject.getTitle());
+
             DomManipulation.pageDialogEle.close();
         });
 
@@ -227,12 +233,15 @@ DomManipulation.deleteProjectButton.addEventListener("click", () => {
     let confirmButton = deleteProjectForm.querySelector(".confirm-button");
     confirmButton.addEventListener("click", (e) => {
         e.preventDefault();
-        Project.removeProjectFromProjectArrayByTitle(currentProject.getTitle());
+        let projectToDeleteTitle = currentProject.getTitle();
+        Project.removeProjectFromProjectArrayByTitle(projectToDeleteTitle);
 
         DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
         currentProject = DomManipulation.createAllProjectsViewObject(Project.getProjectArrayCount());
-        let projectPOJO = currentProject; // For consistency
+        let projectPOJO = currentProject; // Written for consistency of like logic; you could just pass currentProject
         DomManipulation.updateProjectInfoElement(projectPOJO);
+
+        LocalStorage.deleteProjectFromLocal(projectToDeleteTitle);
         
         DomManipulation.pageDialogEle.close();
     });
@@ -340,6 +349,9 @@ DomManipulation.itemListElement.addEventListener("click", (e) => {
                 let projectPOJO = createPOJOFromProject(currentProject);
                 DomManipulation.updateProjectInfoElement(projectPOJO);
                 DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
+
+                LocalStorage.deleteTodoFromLocal(title, currentProject.getTitle());
+
                 DomManipulation.pageDialogEle.close();
             });
                 // Cancel delete
@@ -359,6 +371,11 @@ DomManipulation.itemListElement.addEventListener("click", (e) => {
         let title = e.target.parentElement.parentElement.parentElement.firstElementChild.innerText;
         let todo = currentProject.getTodoByTitle(title);
         todo.setIsComplete(target.checked);
+
+        let todoPOJO = todo.getAllInfoAsObject();
+
+        // This doesn't affect the title of the todo, so we can just pass the POJO's title
+        LocalStorage.updateTodoInLocal(todoPOJO, todoPOJO.title, currentProject.getTitle());
     }
 });
 
@@ -372,11 +389,18 @@ function createTodoFromForm(event, title, description, notes, isComplete, dueDat
     DomManipulation.fillInProjectSideBar(Project.getProjectArrayWithoutTodos());
     let itemList = getTodosAsObjectsByOrderedList(currentProject);
     DomManipulation.updateItemList(currentProject, itemList);
+
+    let todoPOJO = todo.getAllInfoAsObject();
+
+    LocalStorage.storeNewTodoInLocal(todoPOJO, currentProject.getTitle());
+
     DomManipulation.pageDialogEle.close();
 }
 
 function updateTodoFromForm(event, todo, title, description, notes, isComplete, dueDate, priority) {
     event.preventDefault();
+
+    let oldTitle = todo.getTitle();
 
     todo.setTitle(title);
     todo.setDescription(description);
@@ -387,6 +411,11 @@ function updateTodoFromForm(event, todo, title, description, notes, isComplete, 
 
     let itemList = getTodosAsObjectsByOrderedList(currentProject);
     DomManipulation.updateItemList(currentProject, itemList);
+
+    let todoPOJO = todo.getAllInfoAsObject();
+
+    LocalStorage.updateTodoInLocal(todoPOJO, oldTitle, currentProject.getTitle());
+
     DomManipulation.pageDialogEle.close();
 }
 

@@ -135,7 +135,7 @@ function deleteTodoFromLocal(todoTitle, projectTitle, iPos = -1) {
 
     // If iPos was invalid/missing, search through the list to delete it
     for (let i = 0; i < todoKeyStoredList.length; i++) {
-        if (keyToDelete = todoKeyStoredList[i]) {
+        if (keyToDelete === todoKeyStoredList[i]) {
             todoKeyStoredList.splice(i, 1);
             setTodoKeyStoredList(todoKeyStoredList);
             break;
@@ -205,7 +205,7 @@ function deleteProjectFromLocal(projectTitle) {
     // Project stuff
     let projectTitleList = getProjectTitleList();
     for (let i = 0; i < projectTitleList.length; i++) {
-        if (projectTitleList[i] = projectTitle) {
+        if (projectTitleList[i] === projectTitle) {
             projectTitleList.splice(i, 1);
             break;
         }

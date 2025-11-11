@@ -8,7 +8,7 @@ export class Project {
                 return Project.#projectArray[i];
             }
         }
-        console.log(`Couldn't find project with title ${projectTitleToRemove} when attempting to retrieve a project`);
+        console.log(`Couldn't find project with title ${projectTitle} when attempting to retrieve a project`);
     }
     
     static removeProjectFromProjectArrayByTitle(projectTitleToRemove) {

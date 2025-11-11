@@ -4,7 +4,7 @@ let pageDialogEle = document.querySelector("#page-dialog"); // This is used in a
 function initializeDom(projectArrayWithoutTodos, projectCount) {
     fillInProjectSideBar(projectArrayWithoutTodos);
     let allProjectsViewObject = createAllProjectsViewObject(projectCount);
-    updateProjectInfoElement();
+    updateProjectInfoElement(allProjectsViewObject);
     updateItemList(allProjectsViewObject, projectArrayWithoutTodos);
 }
 
@@ -63,7 +63,7 @@ function updateProjectInfoElement(projectPOJO) {
         orderItemsByContainer.hidden = true;
     } else {
         title = projectPOJO.title;
-        itemCount = projectPOJO.title;
+        itemCount = projectPOJO.itemCount;
         createNewItemButton.innerText = "Create New Item";
         viewProjectDetailsButton.innerText = "View/Edit Project Details";
         deleteProjectButton.hidden = false;
