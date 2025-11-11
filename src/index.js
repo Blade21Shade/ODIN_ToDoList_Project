@@ -170,7 +170,12 @@ DomManipulation.createNewItemButton.addEventListener("click", () => {
 
             let isCompleteVal = isComplete.checked === true ? true : false;
 
-            createTodoFromForm(e, title.value, desc.value, notes.value, isCompleteVal, dueDate.valueAsDate, Number.parseFloat(prio.value));
+            // Correct for timezone offset, look at other eventHandler(e) for better description
+            let dateVal = dueDate.valueAsDate;
+            let timezoneOffset = dateVal.getTimezoneOffset();
+            dateVal.setMinutes(timezoneOffset);
+
+            createTodoFromForm(e, title.value, desc.value, notes.value, isCompleteVal, dateVal, Number.parseFloat(prio.value));
         }
 
         saveButton.eventListener = eventHandler;
