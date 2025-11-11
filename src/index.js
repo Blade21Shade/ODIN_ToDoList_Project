@@ -240,6 +240,7 @@ DomManipulation.deleteProjectButton.addEventListener("click", () => {
         currentProject = DomManipulation.createAllProjectsViewObject(Project.getProjectArrayCount());
         let projectPOJO = currentProject; // Written for consistency of like logic; you could just pass currentProject
         DomManipulation.updateProjectInfoElement(projectPOJO);
+        DomManipulation.updateItemList(projectPOJO, Project.getProjectArrayWithoutTodos());
 
         LocalStorage.deleteProjectFromLocal(projectToDeleteTitle);
         
