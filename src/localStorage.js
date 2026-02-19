@@ -224,7 +224,13 @@ function getProjectTitleForTodoInLocal(todoStoredKey) {
 }
 
 function getTodoKeyStoredList() {
-    return [...JSON.parse(localStorage.getItem("todoKeyStoredList"))];
+    let temp = [];
+    try {
+        temp = [...JSON.parse(localStorage.getItem("todoKeyStoredList"))];
+    } catch {
+        // Nothing needs to happen
+    }
+    return temp;
 }
 
 function setTodoKeyStoredList(list) {
@@ -232,7 +238,13 @@ function setTodoKeyStoredList(list) {
 }
 
 function getProjectTitleList() {
-    return [...JSON.parse(localStorage.getItem("projectTitleList"))];
+    let temp = [];
+    try {
+        temp = [...JSON.parse(localStorage.getItem("projectTitleList"))];
+    } catch {
+        // Nothing needs to happen
+    }
+    return temp;
 }
 
 function setProjectTitleList(list) {
